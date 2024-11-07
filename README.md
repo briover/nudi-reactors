@@ -1,11 +1,8 @@
+# DS 2024: Nudi Reactors Repository
+Raw data, data analysis and manipulation
 
----
-title: 'DS 2024: Nudi Reactors Repository'
-subtitle: "Raw data, data analysis and manipulation"
-authors: "Brianna Over, Luca Meyknecht and Fiona Parker"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: pdf_document
----
+Brianna Over, Luca Meyknecht and Fiona Parker
+
 
 
 # nudi-reactors: Directed Study Group Repository
