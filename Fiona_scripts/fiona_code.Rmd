@@ -11,20 +11,141 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r}
+library(here) #loading data
+library(ggplot2) #plotting data
+library(readxl) #importing excel files
+library(sf) #for spatial data
+library(cowplot)
+library(rnaturalearth)
+library(ggspatial)
+library(dplyr)
+library(tidyverse)
+library(circular)
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+nudi_con <- read.csv("./raw_data/rawcons.csv")
+trial_data <- read.csv("./raw_data/rawtrialdata.csv")
 ```
 
-## Including Plots
+```{r}
+cleantrialcons <- trial_data %>%
+  filter(trial_type == "conspecific") %>%
+  select(nudi_id, treatment_group)
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+clean_con12 <- nudi_con%>%
+  filter(temp_grp == 12) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+ avg12 <- clean_con12 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+ 
+clean_con14 <- nudi_con%>%
+  filter(temp_grp == 14) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+ avg14 <- clean_con14 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+ 
+ clean_con16 <- nudi_con%>%
+  filter(temp_grp == 16) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+avg16 <- clean_con16 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+ 
+ clean_con18 <- nudi_con%>%
+  filter(temp_grp == 18) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+ avg18 <- clean_con18 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+```
+```{r}
+ # Install and load patchwork
+install.packages("patchwork")
+library(patchwork)
+
+# Create individual plots for each dataset
+plot_12 <- ggplot(avg12, aes(x = mean_angle, y = 1)) +
+  geom_point(size = 4, color = "red") +
+  coord_polar(theta = "x", start = 0) +
+  scale_x_continuous(limits = c(0, 360), 
+                     breaks = c(0, 90, 180, 270), 
+                     labels = c("0°", "90°", "180°", "270°")) +
+  labs(title = "12°C", x = "Direction (degrees)", y = NULL) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid = element_blank())
+
+plot_14 <- ggplot(avg14, aes(x = mean_angle, y = 1)) +
+  geom_point(size = 4, color = "blue") +
+  coord_polar(theta = "x", start = 0) +
+  scale_x_continuous(limits = c(0, 360), 
+                     breaks = c(0, 90, 180, 270), 
+                     labels = c("0°", "90°", "180°", "270°")) +
+  labs(title = "14°C", x = "Direction (degrees)", y = NULL) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid = element_blank())
+
+plot_16 <- ggplot(avg16, aes(x = mean_angle, y = 1)) +
+  geom_point(size = 4, color = "green") +
+  coord_polar(theta = "x", start = 0) +
+  scale_x_continuous(limits = c(0, 360), 
+                     breaks = c(0, 90, 180, 270), 
+                     labels = c("0°", "90°", "180°", "270°")) +
+  labs(title = "16°C", x = "Direction (degrees)", y = NULL) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid = element_blank())
+
+plot_18 <- ggplot(avg18, aes(x = mean_angle, y = 1)) +
+  geom_point(size = 4, color = "orange") +
+  coord_polar(theta = "x", start = 0) +
+  scale_x_continuous(limits = c(0, 360), 
+                     breaks = c(0, 90, 180, 270), 
+                     labels = c("0°", "90°", "180°", "270°")) +
+  labs(title = "18°C", x = "Direction (degrees)", y = NULL) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid = element_blank())
+
+# Combine plots into a 2x2 grid
+four_panel_plot <- (plot_12 | plot_14) / (plot_16 | plot_18)
+# Apply the margin fix to all individual plots
+
+
+# Display the combined plot
+four_panel_plot
+
+    
+
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+
+
