@@ -16,5 +16,3 @@ The repository will contain datasets and code so that group members can contribu
 
 - **Data Storage**: raw and processed data for analysis.
 - **Code Sharing**: scripts and tools used for data manipulation and analysis.
-- **Collaboration**: provide a space for group discussions and contributions.
-- **Documentation**: document methods and findings to ensure reproducibility.
