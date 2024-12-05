@@ -18,67 +18,191 @@ library(rnaturalearth)
 library(ggspatial)
 library(dplyr)
 library(tidyverse)
-install.packages("circular")
 library(circular)
+library(knitr)
 ```
 
 ```{r}
 nudi_con <- read.csv("./raw_data/rawcons.csv")
 ```
 
-```{r}
-# Libraries
 
-
- 
-# Make the plot
-p <- ggplot(nudi_con, aes(x=as.factor(temp_grp), y= fixdeg)) +       # Note that id is a factor. If x is numeric, there is some space between the first bar
-  
-  # This add the bars with a blue color
-  geom_bar(stat="identity", fill=alpha("blue", 0.3)) +
-  
-  # Limits of the plot = very important. The negative value controls the size of the inner circle, the positive one is useful to add size over each bar
-  ylim(-100,120) +
-  
-  # Custom the theme: no axis title and no cartesian grid
-  theme_minimal() +
-  theme(
-    axis.text = element_blank(),
-    axis.title = element_blank(),
-    panel.grid = element_blank(),
-    plot.margin = unit(rep(-2,4), "cm")     # This remove unnecessary margin around plot
-  ) +
-  
-  # This makes the coordinate polar instead of cartesian.
-  coord_polar(start = 0)
-p
-```
 ```{r chatgpt tryout}
 
 data_avg_gr <- nudi_con %>%
   group_by(nudi_num, temp_grp) %>% 
   summarise(avg_angle = mean(fixdeg,na.rm = TRUE), .groups = "drop")
 
-data_avg <- nudi_con %>%
-  group_by(nudi_num) %>% 
-  summarise(avg_angle = mean(fixdeg,na.rm = TRUE), .groups = "drop")
+#data_avg <- nudi_con %>%
+  #group_by(nudi_num) %>% 
+  #summarise(avg_angle = mean(circular(fixdeg, units = "degrees"),na.rm = TRUE), .groups = "drop")
 
-data_avg <- nudi_con %>%
-  group_by(nudi_num) %>% 
-  summarise(avg_angle = mean(circular(fixdeg, units = "degrees")),na.rm = TRUE, .groups = "drop")
-
-data <- data %>%
-  left_join(data_avg, by = "trial")
-
-ggplot(data_avg_gr, aes(x = avg_angle, y = nudi_num, color = temp_grp)) +
-  geom_point(size = 3, alpha = 0.8) +  # Points sized and slightly transparent
-  coord_polar(start = pi / 2) +  # Convert to polar coordinates
+ggplot(data_avg_gr, aes(x = avg_angle, y = 10, fill = temp_grp)) +
+  geom_point(size = 3, alpha = 0.8, shape = 21, color = "black",stroke = 0.5) +  # Points sized and slightly transparent
+  coord_polar(start = pi / 2) +  # puts the 0 degrees to the right
   scale_x_continuous(breaks = seq(0, 360, 45), limits = c(0, 360)) +  # Custom axis
   labs(title = "Circular Graph of Trial Angles by Treatment",
-       x = "Angle (Degrees)",
-       y = "Trial") +
+       x = "Angle (Degrees)")  +
+  scale_color_gradient(low = "blue", high = "red") +
+  theme_minimal() +  # Clean theme
+  theme(legend.position = "bottom") 
+
+ggplot(data_avg_gr, aes(x = avg_angle, y = 10, fill = temp_grp)) +
+  geom_bar(stat = "identity", width = 0.8, color = "black") +  # Points sized and slightly transparent
+  coord_polar(start = pi / 2) +  # puts the 0 degrees to the right
+  scale_x_continuous(breaks = seq(0, 360, 45), limits = c(0, 360)) +  # Custom axis
+  labs(title = "Circular Graph of Trial Angles by Treatment",
+       x = "Angle (Degrees)")  +
   scale_color_gradient(low = "blue", high = "red") +
   theme_minimal() +  # Clean theme
   theme(legend.position = "bottom") 
 ```
+
+```{r}
+# Install required packages if not already installed
+if (!require(ggplot2)) install.packages("ggplot2")
+if (!require(ggforce)) install.packages("ggforce")
+
+# Load libraries
+library(ggplot2)
+library(ggforce)
+
+# Example data frame
+# Replace this with your actual data
+data <- data.frame(
+  angle = c(30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360),
+  trial = c(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6),
+  treatment = c("A", "B", "A", "B", "A", "B", "A", "B", "A", "B", "A", "B")
+)
+
+# Convert angles to radians for plotting
+data$angle_rad <- data$angle * pi / 180
+
+# Create the circular stacked plot
+ggplot(data, aes(x = angle_rad, fill = treatment)) +
+  geom_bar(width = 0.1, aes(y = ..count..), stat = "count") +
+  scale_x_continuous(breaks = seq(0, 2*pi, by = pi/2), labels = c("0°", "90°", "180°", "270°", "360°")) +
+  coord_polar(theta = "x") +
+  labs(title = "Stacked Circular Plot of Angles by Treatment Group",
+       x = "Angle",
+       y = "Count") +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        panel.grid = element_blank())
+
+```
+```{r}
+ggplot(data_avg_gr, aes(x = avg_angle, fill = nudi_num)) +
+  geom_bar(width = 0.1, aes(y = ..count..), stat = "count") +
+  scale_x_continuous(breaks = seq(0, 2*pi, by = pi/2), labels = c("0°", "90°", "180°", "270°", "360°")) +
+  coord_polar(theta = "x") +
+  labs(title = "Stacked Circular Plot of Angles by Treatment Group",
+       x = "Angle",
+       y = "Count") +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        panel.grid = element_blank())
+```
+```{r}
+experimental.circ <- circular(data_avg_gr$avg_angle, units = "degrees", template = "geographics")
+plot.circular(experimental.circ) 
+
+tryoutcircular <- circular(nudi_con$fixdeg, units = "degrees", template = "none", rotation = "clock", color = nudi_con$temp_grp )
+
+plot.circular(tryoutcircular, stack = TRUE, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(data_avg_gr$avg_angle)
+
+
+# Assign colors based on treatment groups
+treatment_colors <- nudi_con$temp_grp
+color_map <- c("12" = "blue", "14" = "green", "16" = "orange", "18"="red")
+point_colors <- color_map[treatment_colors]
+
+# Plot with group-specific colors
+plot(tryoutcircular, stack = TRUE, col = point_colors, pch = 16, shrink = 1.5)
+
+# Add a legend for clarity
+legend("topright", legend = names(color_map), col = color_map, pch = 16)
+```
+```{r}
+ggplot(nudi_con, aes(x = fixdeg, fill = temp_grp)) +
+  geom_point(size=3) +
+  scale_x_continuous(
+    limits = c(0, 360),
+    breaks = seq(0, 360, by = 90),
+    labels = c("0°", "90°", "180°", "270°", "360°")
+  ) +
+  coord_polar(start= pi / 2) +  # Polar coordinates for circular plot
+  labs(
+    title = "Circular Plot with ggplot2",
+    x = "Angle (Degrees)",
+    y = NULL,
+    fill = "Treatment Group"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    panel.grid = element_blank()
+  )
+```
+```{r}
+ggplot(data_avg_gr, aes(x = avg_angle, fill = temp_grp)) +
+  geom_dotplot(
+    binaxis = "y",  # Stack dots along the y-axis
+    stackdir = "center",  # Stack symmetrically around the y-axis
+    dotsize = 0.8  # Adjust dot size
+  ) +
+  coord_polar(start = pi / 2) +  # Convert to polar coordinates
+  scale_x_continuous(
+    breaks = seq(0, 360, 45), 
+    limits = c(0, 360)
+  ) +  # Custom axis
+  scale_fill_gradient(low = "blue", high = "red") +  # Gradient for temp_grp
+  labs(
+    title = "Circular Graph with Stacked Dots",
+    x = "Angle (Degrees)",
+    y = NULL,
+    fill = "Temperature Group"
+  ) +
+  theme_minimal() +  # Clean theme
+  theme(
+    legend.position = "bottom",  # Move legend to the bottom
+    axis.text.y = element_blank(),  # Remove y-axis labels
+    axis.ticks.y = element_blank()
+  )
+```
+
+```{r}
+# Add stacking logic
+data_avg_gr_2 <- data_avg_gr %>%
+  group_by(avg_angle) %>%
+  mutate(stack_y = row_number())  # Increment y for stacking overlapping points
+
+ggplot(data_avg_gr_2, aes(x = avg_angle, y = stack_y, color = temp_grp)) +
+  geom_point(size = 3, alpha = 0.8, shape = 21, fill = "white", stroke = 0.5) +  # Add black outline
+  coord_polar(start = pi / 2) +  # Convert to polar coordinates
+  scale_x_continuous(
+    breaks = seq(0, 360, by = 45), 
+    limits = c(0, 360)
+  ) +  # Custom axis
+  labs(
+    title = "Circular Plot with Stacked Points",
+    x = "Angle (Degrees)",
+    y = NULL,
+    color = "Temperature Group"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    panel.grid = element_blank()
+  )
+```
+
 
