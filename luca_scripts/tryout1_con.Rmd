@@ -1,6 +1,6 @@
 ---
-title: "luca_code"
-output: html_document
+title: "Nudi_tryout1"
+output: pdf_document
 date: "2024-12-05"
 ---
 
@@ -22,9 +22,12 @@ install.packages("circular")
 library(circular)
 ```
 
+
 ```{r}
-nudi_con <- read.csv("./raw_data/rawcons.csv")
+nudi_con <- read.csv("./nudidata/cons_trial.csv")
 ```
+
+
 
 ```{r}
 # Libraries
