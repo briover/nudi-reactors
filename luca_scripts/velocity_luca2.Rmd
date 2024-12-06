@@ -20,6 +20,15 @@ library(dplyr)
 library(tidyverse)
 library(circular)
 library(knitr)
+library(glmmTMB)
+library(DHARMa)
+library(ggeffects)
+library(performance)
+library(car)
+library(mgcv)
+library(fitdistrplus)
+library(goft)
+library(gamlss)
 ```
 
 ```{r}
@@ -27,6 +36,80 @@ nudi_data <- read.csv("./clean_data/combinedraw.csv")
 ```
 
 ```{r}
+#ggplot(nudi_data, aes(x = temp_grp, y = mean_vel, size = size, fill = temp_grp)) +
+ # geom_point(shape = 21, alpha = 0.8, color = "black", stroke = 0.5) +  # Bubble plot
+ # scale_size_continuous(name = "Organism Size", range = c(3, 10)) +  # Adjust bubble size
+  #scale_fill_manual(values = c("Low" = "blue", "Medium" = "green", "High" = "red")) +  # Colors for temperature groups
+ # labs(
+   # title = "Relationship Between Velocity and Temperature Groups",
+   # x = "Temperature Group",
+   # y = "Velocity",
+   # fill = "Temperature Group"
+ # ) +
+ # theme_minimal() +
+ # theme(
+ #   legend.position = "bottom"
+ # )
+```
+```{r}
+mod_co_nudi <- lm(mean_vel ~ temp_grp + avg_length_m, 
+             data = nudi_data)
+summary(mod_co_nudi)
+vif(mod_co_nudi)
+simulateResiduals(mod_co_nudi)%>%
+  plot()
 
+```
+```{r}
+nudi_gammawrong <- glm(mean_vel ~ temp_grp + avg_length_m, family = Gamma(link = "log"), data = nudi_data)
+summary(nudi_gammawrong)
+simulateResiduals(nudi_gammawrong)%>%
+  plot()
+```
+
+
+```{r}
+nudi_gamma <- glmmTMB(mean_vel ~ temp_grp + avg_length_m, family = Gamma(link = "log"), data = nudi_data)
+simulateResiduals(nudi_gamma)%>%
+  plot()
+```
+
+```{r}
+nudi_gaussian <- glmmTMB(mean_vel ~ temp_grp + avg_length_m, family = gaussian(link = "identity"), data = nudi_data)
+```
+
+
+```{r}
+hist(nudi_data$mean_vel, breaks = 30, main = "Histogram of mean_vel", xlab = "mean_vel")
+
+AIC(nudi_gaussian, nudi_gamma)
+BIC(nudi_gaussian, nudi_gamma)
+
+simulateResiduals(nudi_gaussian) %>% plot()
+simulateResiduals(nudi_gamma) %>% plot()
+```
+```{r}
+# Create new data for prediction using reframe()
+prediction_data <- nudi_data %>%
+  group_by(temp_grp) %>%
+  reframe(avg_length_m = seq(min(avg_length_m), max(avg_length_m), length.out = 100)) %>%
+  ungroup()
+
+# Add predictions
+prediction_data <- prediction_data %>%
+  mutate(predicted_mean_vel = predict(nudi_gamma, newdata = ., type = "response"))
+
+# Plot observed data and predictions
+ggplot() +
+  geom_point(data = nudi_data, aes(x = avg_length_m, y = mean_vel, color = temp_grp), size = 3, alpha = 0.7) +
+  geom_line(data = prediction_data, aes(x = avg_length_m, y = predicted_mean_vel, color = temp_grp), size = 1) +
+  labs(
+    title = "Relationship Between Mean Velocity, Average Length, and Temperature Group",
+    x = "Average Length (m)",
+    y = "Mean Velocity",
+    color = "Temperature Group"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
 ```
 
