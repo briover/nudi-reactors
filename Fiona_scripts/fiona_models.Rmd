@@ -1,0 +1,41 @@
+---
+title: "models"
+author: "Fiona Parker"
+date: "2024-12-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(here) #loading data
+library(ggplot2) #plotting data
+library(readxl) #importing excel files
+library(sf) #for spatial data
+library(cowplot)
+library(rnaturalearth)
+library(ggspatial)
+library(dplyr)
+library(tidyverse)
+library(circular)
+rawcons <- read.csv("./raw_data/rawcons.csv")
+
+rawpreds <- read.csv("./raw_data/rawpred.csv")%>%
+  rename(temp_grp = temp)
+
+combinedraw <- rbind(rawcons,rawpreds)%>%
+  mutate(temp_grp = as.factor(temp_grp))%>%
+     group_by(nudi_num, temp_grp, trial_type) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE), 
+             mean_vel = mean(v_ms, na.rm = TRUE))%>%
+  mutate(direction_binom = case_when(
+    mean_angle >= 0 & mean_angle <= 180 ~ 0,
+    mean_angle <= 360 & mean_angle >180 ~ 1
+  ))
+#load in new nudi length sheet, use a leftjoin to join new nudi data to combined raw (its in tidyr) by = "nudi_num"
+str(combinedraw)
+write.csv(combinedraw, file = "./clean_data/combinedraw.csv", row.names = FALSE)
+```
+

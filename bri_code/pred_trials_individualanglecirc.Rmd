@@ -1,0 +1,80 @@
+---
+title: "pred_trials_sepanglecirc"
+author: "Bri Over"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Load necessary libraries
+library(circular)
+library(ggplot2)
+library(dplyr)
+
+# Load the dataset
+nudibranch_data <- read.csv("raw_data/rawpred.csv", sep = ",", header = TRUE)
+
+# Calculate the average angle for each nudibranch (nudi_num) grouped by temperature
+nudibranch_summary <- nudibranch_data %>%
+  group_by(nudi_num, temp) %>%
+  summarise(mean_fixdeg = mean(fixdeg, na.rm = TRUE), .groups = "drop")
+
+# Convert the averaged angles to circular data
+nudibranch_summary$circular_fixdeg <- circular(
+  nudibranch_summary$mean_fixdeg,
+  units = "degrees",
+  template = "none",
+  modulo = "2pi",
+  zero = 0,
+  rotation = "clock"
+)
+
+# Define a color palette for temperatures
+color_mapping <- c("12" = "blue", "14" = "purple", "16" = "orange", "18" = "red")
+
+# Add a column for colors
+nudibranch_summary <- nudibranch_summary %>%
+  mutate(color = color_mapping[as.character(temp)])
+
+# Create a facetted circular plot
+ggplot(nudibranch_summary, aes(x = mean_fixdeg, y = 1, color = as.factor(temp))) +
+  geom_point(
+    size = 1,                   # Adjust point size for visibility
+    position = position_jitter(width = 1, height = 0)  # Slight horizontal jitter for stacking
+  ) +
+  coord_polar(start = pi/2) +  # Start at 90° (bottom), counter-clockwise rotation
+  scale_x_continuous(
+    breaks = seq(0, 360, 90),   # Define degree breaks (0, 90, 180, 270)
+    limits = c(0, 359)         # Circular limits
+    ) +
+  facet_wrap(~temp, ncol = 2, strip.position = "top", 
+             labeller = labeller(temp = c("12" = "A", "14" = "B", "16" = "C", "18" = "D"))) +  # Change facet labels to A, B, C, D
+  scale_color_manual(
+    values = color_mapping,  # Map colors to temperature groups
+    name = "Temperature (°C)"
+  ) +
+  labs(
+    title = "Nudibranch Orientation by Temperature",
+    x = NULL,
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_blank(),             # Remove radial axis text
+    axis.ticks.y = element_blank(),            # Remove radial axis ticks
+    panel.grid.minor = element_blank(),        # Remove minor grid lines
+    panel.grid.major = element_line(color = "gray", linetype = "dotted"),
+    panel.spacing.x = unit(2, "lines"),        # Increase space between facets
+    strip.background = element_blank(),        # Remove background of facet labels
+    strip.text = element_text(size = 12)       # Make facet labels larger
+  )
+
+
+```
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
