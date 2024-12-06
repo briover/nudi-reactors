@@ -22,6 +22,8 @@ library(tidyverse)
 library(circular)
 rawcons <- read.csv("./raw_data/rawcons.csv")
 
+nudisize <- read.csv("./raw_data/nudisizeraw.csv")
+
 rawpreds <- read.csv("./raw_data/rawpred.csv")%>%
   rename(temp_grp = temp)
 
@@ -30,6 +32,7 @@ combinedraw <- rbind(rawcons,rawpreds)%>%
      group_by(nudi_num, temp_grp, trial_type) %>%
    summarise(mean_angle = mean(fixdeg, na.rm = TRUE), 
              mean_vel = mean(v_ms, na.rm = TRUE))%>%
+  left_join( y = nudisize, by = "nudi_num")%>%
   mutate(direction_binom = case_when(
     mean_angle >= 0 & mean_angle <= 180 ~ 0,
     mean_angle <= 360 & mean_angle >180 ~ 1
