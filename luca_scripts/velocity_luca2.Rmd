@@ -88,7 +88,7 @@ BIC(nudi_gaussian, nudi_gamma)
 simulateResiduals(nudi_gaussian) %>% plot()
 simulateResiduals(nudi_gamma) %>% plot()
 ```
-```{r}
+```{r chatgpt model}
 # Create new data for prediction using reframe()
 prediction_data <- nudi_data %>%
   group_by(temp_grp) %>%
@@ -112,7 +112,7 @@ ggplot() +
   theme_minimal() +
   theme(legend.position = "bottom")
 ```
-```{r}
+```{r chatgpt statistical tests with anova}
 # Reduced model without temp_grp
 nudi_gamma_reducedtemp <- glmmTMB(mean_vel ~ avg_length_m, family = Gamma(link = "log"), data = nudi_data)
 nudi_gamma_reducedlength <- glmmTMB(mean_vel ~ temp_grp, family = Gamma(link = "log"), data = nudi_data)
