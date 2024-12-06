@@ -1,0 +1,20 @@
+---
+title: "stats"
+author: "Bri Over"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/brian/Documents/Bamfield Fall 2024/DS-ADA/DS/nudi-git")
+```
+
+```{r}
+conspecific_data <- read.csv("raw_data/rawcons.csv")
+```
+
+```{r}
+
+```
+
