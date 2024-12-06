@@ -1,0 +1,32 @@
+---
+title: "velocity_luca_2"
+output: html_document
+date: "2024-12-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(here) #loading data
+library(ggplot2) #plotting data
+library(readxl) #importing excel files
+library(sf) #for spatial data
+library(cowplot)
+library(rnaturalearth)
+library(ggspatial)
+library(dplyr)
+library(tidyverse)
+library(circular)
+library(knitr)
+```
+
+```{r}
+nudi_data <- read.csv("./clean_data/combinedraw.csv")
+```
+
+```{r}
+
+```
+
