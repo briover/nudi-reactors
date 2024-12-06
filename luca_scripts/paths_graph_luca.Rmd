@@ -1,0 +1,43 @@
+---
+title: "paths_graphs"
+output: html_document
+date: "2024-12-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, library stuffs}
+library(here) #loading data
+library(ggplot2) #plotting data
+library(readxl) #importing excel files
+library(sf) #for spatial data
+library(cowplot)
+library(rnaturalearth)
+library(ggspatial)
+library(dplyr)
+library(tidyverse)
+library(circular)
+library(knitr)
+
+```
+
+```{r, data load in}
+nudi_con <- read.csv("./raw_data/rawcons.csv")
+
+```
+
+```{r}
+ggplot(nudi_con, aes(x = fixx_m, y = fixy_m, group = nudi_num, colour = nudi_num)) +
+  geom_path( size = 1) +  # Line connecting points
+  geom_point(size = 2) +  # Optional: Points at each step
+  labs(
+    title = "Paths Followed by Each Treatment Group",
+    x = "X Coordinate",
+    y = "Y Coordinate",
+    color = "Treatment"
+  ) +
+  theme_minimal()
+```
+

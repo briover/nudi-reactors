@@ -1,0 +1,46 @@
+---
+title: "speed_graphs_luca"
+output: html_document
+date: "2024-12-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, library stuffs}
+library(here) #loading data
+library(ggplot2) #plotting data
+library(readxl) #importing excel files
+library(sf) #for spatial data
+library(cowplot)
+library(rnaturalearth)
+library(ggspatial)
+library(dplyr)
+library(tidyverse)
+library(circular)
+library(knitr)
+
+```
+
+```{r, data load in}
+nudi_con <- read.csv("./raw_data/rawcons.csv")
+
+```
+
+```{r}
+data_avg_speed <- nudi_con %>%
+  group_by(nudi_num, temp_grp) %>% 
+  summarise(avg_speed = mean(v_ms,na.rm = TRUE), .groups = "drop")
+```
+
+```{r}
+
+mean_speed <- data_avg_speed %>%
+  group_by(temp_grp) %>%  # Group by trial and treatment group
+  summarise(mean_speed = mean(avg_speed, na.rm = TRUE), .groups = "drop")
+
+ggplot(data_avg_speed, aes(x = temp_grp, y = avg_speed, group = temp_grp, colour = temp_grp)) +
+  geom_point(size = 3, alpha = 0.8, shape = 21, color = "black",stroke = 0.5) 
+```
+

@@ -25,6 +25,7 @@ library(circular)
 
 nudi_con <- read.csv("./raw_data/rawcons.csv")
 trial_data <- read.csv("./raw_data/rawtrialdata.csv")
+nudi_preds <- read.csv("./raw_data/rawpred.csv")
 ```
 
 ```{r}
@@ -75,13 +76,12 @@ avg16 <- clean_con16 %>%
 ```
 ```{r}
  # Install and load patchwork
-install.packages("patchwork")
 library(patchwork)
 
 # Create individual plots for each dataset
 plot_12 <- ggplot(avg12, aes(x = mean_angle, y = 1)) +
-  geom_point(size = 4, color = "red") +
-  coord_polar(theta = "x", start = 0) +
+  geom_point(size = 2, color = "red") +
+  coord_polar(theta = "x", start = pi/2, clip = "off") +
   scale_x_continuous(limits = c(0, 360), 
                      breaks = c(0, 90, 180, 270), 
                      labels = c("0°", "90°", "180°", "270°")) +
@@ -93,8 +93,8 @@ plot_12 <- ggplot(avg12, aes(x = mean_angle, y = 1)) +
         panel.grid = element_blank())
 
 plot_14 <- ggplot(avg14, aes(x = mean_angle, y = 1)) +
-  geom_point(size = 4, color = "blue") +
-  coord_polar(theta = "x", start = 0) +
+  geom_point(size = 2, color = "blue") +
+  coord_polar(theta = "x", start = pi/2, clip = "off") +
   scale_x_continuous(limits = c(0, 360), 
                      breaks = c(0, 90, 180, 270), 
                      labels = c("0°", "90°", "180°", "270°")) +
@@ -106,8 +106,8 @@ plot_14 <- ggplot(avg14, aes(x = mean_angle, y = 1)) +
         panel.grid = element_blank())
 
 plot_16 <- ggplot(avg16, aes(x = mean_angle, y = 1)) +
-  geom_point(size = 4, color = "green") +
-  coord_polar(theta = "x", start = 0) +
+  geom_point(size = 2, color = "green") +
+  coord_polar(theta = "x", start = pi/2, clip = "off") +
   scale_x_continuous(limits = c(0, 360), 
                      breaks = c(0, 90, 180, 270), 
                      labels = c("0°", "90°", "180°", "270°")) +
@@ -119,8 +119,8 @@ plot_16 <- ggplot(avg16, aes(x = mean_angle, y = 1)) +
         panel.grid = element_blank())
 
 plot_18 <- ggplot(avg18, aes(x = mean_angle, y = 1)) +
-  geom_point(size = 4, color = "orange") +
-  coord_polar(theta = "x", start = 0) +
+  geom_point(size = 2, color = "orange") +
+  coord_polar(theta = "x", start = pi/2, clip = "off") +
   scale_x_continuous(limits = c(0, 360), 
                      breaks = c(0, 90, 180, 270), 
                      labels = c("0°", "90°", "180°", "270°")) +
@@ -132,8 +132,20 @@ plot_18 <- ggplot(avg18, aes(x = mean_angle, y = 1)) +
         panel.grid = element_blank())
 
 # Combine plots into a 2x2 grid
-four_panel_plot <- (plot_12 | plot_14) / (plot_16 | plot_18)
-# Apply the margin fix to all individual plots
+four_panel_plot <- plot_grid(
+  plot_12, plot_14, plot_16, plot_18,  # Plots to combine
+  ncol = 2,  # Number of columns
+  align = "hv",  # Align both horizontally and vertically
+  rel_heights = c(1, 1),  # Adjust relative heights
+  rel_widths = c(1, 1)  # Adjust relative widths
+)
+
+# Ensure there’s enough space for labels by increasing the output size
+
+ggsave("four_panel_plot.png", plot = four_panel_plot, width = 14, height = 12)
+
+
+
 
 
 # Display the combined plot
@@ -143,6 +155,257 @@ four_panel_plot
 
 
 ```
+
+
+```{r}
+# Load necessary libraries
+
+
+create_circular_plot <- function(data, color, title, base_radius = 2, stack_spacing = 2) {
+  # Calculate stacking: Add a 'stack' column for radial stacking
+  data <- data %>%
+    group_by(mean_angle) %>%                   # Group by angles to handle stacking
+    mutate(stack_position = base_radius + (row_number() - 1) * stack_spacing)  # Increment radial positions
+
+  # Create a data frame for the circular frame
+  circle_data <- data.frame(
+    mean_angle = seq(0, 360, by = 1),
+    y = base_radius  # Circle radius
+  )
+
+  # Create the plot
+  ggplot(data, aes(x = mean_angle, y = stack_position)) +
+    geom_point(size = 4, color = color) +  # Plot points at stacked positions
+    geom_path(data = circle_data, aes(x = mean_angle, y = y), color = "black", size = 1) +  # Add circular frame
+    coord_polar(theta = "x", start = pi/2, clip = "off") +  # Rotate: 270° at the top, 0° at the right
+    scale_x_continuous(
+      breaks = c(0, 90, 180, 270),
+      labels = c("0°", "90°", "180°", "270°")
+    ) +
+    labs(title = title, x = "Direction (degrees)", y = NULL) +
+    theme_minimal() +
+    theme(
+      axis.title.y = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks.y = element_blank(),
+      panel.grid = element_blank(),
+      plot.margin = unit(c(2, 2, 2, 2), "cm")  # Increase margins for better visibility
+    )
+}
+
+   
+
+
+# Create individual plots for each temperature group
+plot_12 <- create_circular_plot(avg12, "red", "12°C")
+plot_14 <- create_circular_plot(avg14, "blue", "14°C")
+plot_16 <- create_circular_plot(avg16, "green", "16°C")
+plot_18 <- create_circular_plot(avg18, "orange", "18°C")
+
+# Combine the plots into a 2x2 grid using patchwork
+four_panel_plot <- (plot_12 | plot_14) / (plot_16 | plot_18)
+
+# Display the combined plot
+print(four_panel_plot)
+
+# Optionally, save the combined plot
+ggsave("four_panel_plot_fixed.png", plot = four_panel_plot, width = 14, height = 12, dpi = 300)
+
+```
+```{r}
+create_circular_plot <- function(data, color, title, base_radius = 2, stack_spacing = 0.1) {
+  # Ensure all angles are rounded to a small precision for grouping
+  data <- data %>%
+    mutate(mean_angle = round(mean_angle, 1)) %>%  # Avoid floating-point errors
+    group_by(mean_angle) %>%                      # Group by rounded angles
+    mutate(stack_position = base_radius + (row_number() - 1) * stack_spacing) %>%  # Increment stacking position
+    ungroup()
+
+  # Create a data frame for the circular frame
+  circle_data <- data.frame(
+    mean_angle = seq(0, 360, by = 1),  # Full circle
+    y = base_radius                    # Base radius of the circle
+  )
+
+  # Plot the data with stacking
+  ggplot(data, aes(x = mean_angle, y = stack_position)) +
+    geom_point(size = 4, color = color) +  # Plot stacked points
+    geom_path(data = circle_data, aes(x = mean_angle, y = y), color = "black", size = 1) +  # Circular frame
+    coord_polar(theta = "x", start = pi/2, clip = "off") +  # Rotate: 270° at the top, 0° at the right
+    scale_x_continuous(
+      breaks = c(0, 90, 180, 270),  # Label positions
+      labels = c("0°", "90°", "180°", "270°")
+    ) +
+    labs(title = title, x = "Direction (degrees)", y = NULL) +
+    theme_minimal() +
+    theme(
+      axis.title.y = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks.y = element_blank(),
+      panel.grid = element_blank(),
+      plot.margin = unit(c(2, 2, 2, 2), "cm")  # Increase margins to ensure labels are visible
+    )
+}
+
+# Create individual plots for each temperature group
+plot_12 <- create_circular_plot(avg12, "red", "12°C", base_radius = 2, stack_spacing = 0.2)
+plot_14 <- create_circular_plot(avg14, "blue", "14°C", base_radius = 2, stack_spacing = 0.2)
+plot_16 <- create_circular_plot(avg16, "green", "16°C", base_radius = 2, stack_spacing = 0.2)
+plot_18 <- create_circular_plot(avg18, "orange", "18°C", base_radius = 2, stack_spacing = 0.2)
+
+# Combine the plots into a 2x2 grid using patchwork
+four_panel_plot <- (plot_12 | plot_14) / (plot_16 | plot_18)
+
+# Display the combined plot
+print(four_panel_plot)
+
+# Optionally, save the combined plot
+ggsave("four_panel_plot_stacked_points.png", plot = four_panel_plot, width = 14, height = 12, dpi = 300)
+
+```
+
+```{r}
+
+#good! makes nice transparent points
+create_circular_plot <- function(data, color, title, base_radius = 4, point_alpha = 0.5, point_size = 5) {
+  # Create a data frame for the circular frame
+  circle_data <- data.frame(
+    mean_angle = seq(0, 360, by = 1),  # Full circle
+    y = base_radius                    # Base radius of the circle
+  )
+
+  # Plot the data with transparency and outlines
+  ggplot(data, aes(x = mean_angle, y = base_radius)) +
+    geom_point(size = point_size, alpha = point_alpha, fill = color, color = "black", shape = 21) +  # Transparent points with black outlines
+    geom_path(data = circle_data, aes(x = mean_angle, y = y), color = "black", size = 1) +  # Circular frame
+    coord_polar(theta = "x", start = pi/2, clip = "off") +  # Rotate: 270° at the top, 0° at the right
+    scale_x_continuous(
+      breaks = c(0, 90, 180, 270),  # Label positions
+      labels = c("0°", "90°", "180°", "270°")
+    ) +
+    labs(title = title, x = "Direction (degrees)", y = NULL) +
+    theme_minimal() +
+    theme(
+      axis.title.y = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks.y = element_blank(),
+      panel.grid = element_blank(),
+      plot.margin = unit(c(1, 1, 1, 1), "cm")  # Increase margins to ensure labels are visible
+    )
+}
+
+# Create individual plots for each temperature group
+plot_12 <- create_circular_plot(avg12, "red", "12°C", base_radius = 4, point_alpha = 0.5)
+plot_14 <- create_circular_plot(avg14, "blue", "14°C", base_radius = 4, point_alpha = 0.5)
+plot_16 <- create_circular_plot(avg16, "green", "16°C", base_radius = 4, point_alpha = 0.5)
+plot_18 <- create_circular_plot(avg18, "orange", "18°C", base_radius = 4, point_alpha = 0.5)
+
+# Combine the plots into a 2x2 grid using patchwork
+four_panel_plot <- (plot_12 | plot_14) / (plot_16 | plot_18)
+
+# Display the combined plot
+print(four_panel_plot)
+
+# Optionally, save the combined plot
+ggsave("four_panel_plot_transparent_points.png", plot = four_panel_plot, width = 12, height = 12, dpi = 300)
+
+```
+
+```{r}
+
+nudi_pred <- nudi_preds%>%
+  rename(temp_grp = temp)
+
+clean_pred12 <- nudi_pred%>%
+  filter(temp_grp == 12) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+ avg12p <- clean_pred12 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+ 
+clean_pred14 <- nudi_pred%>%
+  filter(temp_grp == 14) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+ avg14p <- clean_pred14 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+ 
+ clean_pred16 <- nudi_pred%>%
+  filter(temp_grp == 16) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+avg16p <- clean_pred16 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+ 
+ clean_pred18 <- nudi_pred%>%
+  filter(temp_grp == 18) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+ avg18p <- clean_pred18 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+```
+```{r}
+
+#good! makes nice transparent points
+create_circular_plot <- function(data, color, title, base_radius = 4, point_alpha = 0.5, point_size = 5) {
+  # Create a data frame for the circular frame
+  circle_data <- data.frame(
+    mean_angle = seq(0, 360, by = 1),  # Full circle
+    y = base_radius                    # Base radius of the circle
+  )
+
+  # Plot the data with transparency and outlines
+  ggplot(data, aes(x = mean_angle, y = base_radius)) +
+    geom_point(size = point_size, alpha = point_alpha, fill = color, color = "black", shape = 21) +  # Transparent points with black outlines
+    geom_path(data = circle_data, aes(x = mean_angle, y = y), color = "black", size = 1) +  # Circular frame
+    coord_polar(theta = "x", start = pi/2, clip = "off") +  # Rotate: 270° at the top, 0° at the right
+    scale_x_continuous(
+      breaks = c(0, 90, 180, 270),  # Label positions
+      labels = c("0°", "90°", "180°", "270°")
+    ) +
+    labs(title = title, x = "Direction (degrees)", y = NULL) +
+    theme_minimal() +
+    theme(
+      axis.title.y = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks.y = element_blank(),
+      panel.grid = element_blank(),
+      plot.margin = unit(c(1, 1, 1, 1), "cm")  # Increase margins to ensure labels are visible
+    )
+}
+
+# Create individual plots for each temperature group
+plot_12 <- create_circular_plot(avg12p, "red", "12°C", base_radius = 4, point_alpha = 0.5)
+plot_14 <- create_circular_plot(avg14p, "blue", "14°C", base_radius = 4, point_alpha = 0.5)
+plot_16 <- create_circular_plot(avg16p, "green", "16°C", base_radius = 4, point_alpha = 0.5)
+plot_18 <- create_circular_plot(avg18p, "orange", "18°C", base_radius = 4, point_alpha = 0.5)
+
+# Combine the plots into a 2x2 grid using patchwork
+four_panel_plot <- (plot_12 | plot_14) / (plot_16 | plot_18)
+
+# Display the combined plot
+print(four_panel_plot)
+
+# Optionally, save the combined plot
+ggsave("four_panel_plot_transparent_points_pred.png", plot = four_panel_plot, width = 12, height = 12, dpi = 300)
+```
+```{r}
+
+```
+
+
 
 
 
