@@ -499,9 +499,9 @@ create_circular_plotp <- function(data, title = NULL, base_radius = 4, point_alp
     )
 }
 
-plot_avgsc <- create_circular_plot(consavgsangles, title = NULL)
+plot_avgsp <- create_circular_plot(predmeanangles, title = NULL)
 
-ggsave("./cons_avg_plots.png", plot = plot_avgsc, width = 12, height = 12, dpi = 300)
+ggsave("./pred_avg_plots.png", plot = plot_avgsp, width = 12, height = 12, dpi = 300)
 
 ```
 
