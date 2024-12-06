@@ -112,4 +112,15 @@ ggplot() +
   theme_minimal() +
   theme(legend.position = "bottom")
 ```
+```{r}
+# Reduced model without temp_grp
+nudi_gamma_reducedtemp <- glmmTMB(mean_vel ~ avg_length_m, family = Gamma(link = "log"), data = nudi_data)
+nudi_gamma_reducedlength <- glmmTMB(mean_vel ~ temp_grp, family = Gamma(link = "log"), data = nudi_data)
+# Compare models
+anova(nudi_gamma, nudi_gamma_reducedlength, test = "Chisq")
+anova(nudi_gamma, nudi_gamma_reducedtemp, test = "Chisq")
+
+lm_veltemp <- lm(mean_vel ~ temp_grp, data= nudi_data)
+anova(lm_veltemp)
+```
 
