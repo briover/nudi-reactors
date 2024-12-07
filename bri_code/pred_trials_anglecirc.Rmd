@@ -43,7 +43,7 @@ plot.circular(
   sep = 0.08,                    # Space between stacked points
   shrink = 1,                  # Adjust circle size
   pch = 20,                      # Solid circle points
-  col = c("12" = "blue", "14" = "purple", "16" = "green", "18" = "red"),  # Assign mapped colors directly
+  sub=),  # Assign mapped colors directly
   main = "Average Nudibranch Orientation by Temperature"
 )
 
