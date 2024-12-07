@@ -1,5 +1,5 @@
 ---
-title: "stats"
+title: "binomial model for nudi reaction"
 author: "Bri Over"
 date: "`r Sys.Date()`"
 output: html_document
@@ -8,13 +8,154 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 setwd("C:/Users/brian/Documents/Bamfield Fall 2024/DS-ADA/DS/nudi-git")
+library(here)
+library(glmmTMB)
+library(tidyverse)
+library(DHARMa)
+library(ggeffects)
+library(performance)
+library(car)
+library(mgcv)
+library(fitdistrplus)
+library(goft)
+library(gamlss)
 ```
 
 ```{r}
-conspecific_data <- read.csv("raw_data/rawcons.csv")
+nudi_data <- read.csv("clean_data/combinedraw.csv")
+# Read in the original dataset
+
+# Create a new variable 'expected_direction' based on the trial_type
+nudi_data$expected_direction <- ifelse(nudi_data$trial_type == "conspecific", 1, 0)
+
+# Create a new variable 'move_as_expected' to indicate whether the observed direction matches the expected direction
+nudi_data$move_as_expected <- ifelse(nudi_data$direction_binom == nudi_data$expected_direction, 1, 0)
+
+# View the structure of the updated dataset to confirm that the new variables have been added
+str(nudi_data)
+
+```
+
+
+```{r}
+glm_binom <- glmmTMB(move_as_expected ~ temp_grp + avg_length_m, family = binomial(link = "logit"), data = nudi_data)
+simulateResiduals(glm_binom)%>%
+  plot()
+
+```
+
+
+```{r}
+glm_bbinom <- glmmTMB(move_as_expected ~ temp_grp + avg_length_m, family = betabinomial(link = "logit"), data = nudi_data)
+simulateResiduals(glm_bbinom)%>%
+  plot()
+#treats temperature and length separately
+
+```
+
+
+```{r}
+# Fit Zero-Inflated Binomial Model
+glm_zib <- glmmTMB(direction_binom ~ temp_grp + avg_length_m, 
+                   family = binomial(link = "logit"), 
+                   zi = ~ temp_grp + avg_length_m, 
+                   data = nudi_data)
+
+# Check the model summary
+summary(glm_zib)
+
+
+simulateResiduals(glm_zib) %>% 
+  plot()
+
+```
+
+
+
+```{r}
+AIC(glm_bbinom, glm_binom, glm_zib)
 ```
 
 ```{r}
+#only AIC for binom, which glm_binom AIC = 69.11
+
+summary(glm_binom)
+
+#Temperature effect: The p-value for temp_grp is  not significant at the standard 0.05 significance level: means that, based on this model, there is no strong evidence that temperature affects the nudibranchs' response to conspecific or predatory cues.
+
+#Size effect: Similarly, the p-value for avg_length_m is greater than 0.05 suggesting that the size of the nudibranchs does not significantly impact their direction of movement.
 
 ```
+
+
+```{r}
+#modeling both the main effects of each variable and their interaction: modeling the effect of temperature, the effect of size, and how the effect of temperature changes depending on the size of the nudibranch
+
+# Fit the model with interaction between temperature and body size
+glm_binom_int <- glmmTMB(move_as_expected ~ temp_grp * avg_length_m, family = binomial(link = "logit"), data = nudi_data)
+
+simulateResiduals(glm_binom_int)%>%
+  plot()
+
+summary(glm_binom_int)
+
+
+```
+
+```{r}
+glm_bbinom_int <- glmmTMB(move_as_expected ~ temp_grp * avg_length_m, family = betabinomial(link = "logit"), data = nudi_data)
+
+simulateResiduals(glm_bbinom_int)%>%
+  plot()
+
+
+summary(glm_binom_int)
+
+```
+
+
+```{r}
+# Fit Zero-Inflated Binomial Model
+glm_zib_int <- glmmTMB(direction_binom ~ temp_grp * avg_length_m, 
+                   family = binomial(link = "logit"), 
+                   zi = ~ temp_grp + avg_length_m, 
+                   data = nudi_data)
+
+summary(glm_zib_int)
+
+
+simulateResiduals(glm_zib_int) %>% 
+  plot()
+
+```
+
+
+```{r}
+AIC(glm_bbinom_int, glm_binom_int, glm_zib_int)
+
+#interaction made this worse somehow: AIC for glm_binom_int = 70.03
+```
+
+
+```{r}
+# Final chosen model (based on AIC)
+glm_binom_final <- glmmTMB(move_as_expected ~ temp_grp + avg_length_m, family = binomial(link = "logit"), data = nudi_data)
+
+# Check model summary
+summary(glm_binom_final)
+
+# Check AIC
+AIC(glm_binom_final)
+
+# Visualize effects
+effect_temp <- ggeffect(glm_binom_final, terms = "temp_grp")
+plot(effect_temp)
+
+effect_size <- ggeffect(glm_binom_final, terms = "avg_length_m")
+plot(effect_size)
+```
+
+
+
+
 
