@@ -5,6 +5,11 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
+faster as got bigger but looking at interaction can see that bigger or smaller did not matter 
+as temperature increased
+only difference was in 18 compared to 12 (nudis at 18 moved slower)
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 setwd("C:/Users/brian/Documents/Bamfield Fall 2024/DS-ADA/DS/nudi-git")
@@ -22,14 +27,16 @@ library(gamlss)
 ```
 
 ```{r}
-nudi_data <- read.csv("clean_data/combinedraw.csv")
+nudi_data <- read.csv("clean_data/combinedraw.csv")%>%
+  mutate(temp_grp = as.factor(temp_grp))
+nudi_data$trial_type[nudi_data$trial_type=="conspecific "] <- "conspecific"
 # Read in the original dataset
 
 # Create a new variable 'expected_direction' based on the trial_type
-nudi_data$expected_direction <- ifelse(nudi_data$trial_type == "conspecific", 1, 0)
+#nudi_data$expected_direction <- ifelse(nudi_data$trial_type == "conspecific", 1, 0)
 
 # Create a new variable 'move_as_expected' to indicate whether the observed direction matches the expected direction
-nudi_data$move_as_expected <- ifelse(nudi_data$direction_binom == nudi_data$expected_direction, 1, 0)
+#nudi_data$move_as_expected <- ifelse(nudi_data$direction_binom == nudi_data$expected_direction, 1, 0)
 
 # View the structure of the updated dataset to confirm that the new variables have been added
 str(nudi_data)
@@ -38,23 +45,30 @@ str(nudi_data)
 
 
 ```{r}
-glm_binom <- glmmTMB(move_as_expected ~ temp_grp + avg_length_m, family = binomial(link = "logit"), data = nudi_data)
-simulateResiduals(glm_binom)%>%
+#glm_binom <- glmmTMB(move_as_expected ~ temp_grp * avg_length_m + trial_type, family = binomial(link = "logit"), data = nudi_data)
+#simulateResiduals(glm_binom)%>%
+#  plot()
+
+glm_binom2 <- glmmTMB(direction_binom ~ temp_grp * avg_length_m + trial_type, family = binomial(link = "logit"), data = nudi_data)
+simulateResiduals(glm_binom2)%>%
   plot()
 
+#summary(glm_binom)
+summary(glm_binom2)
+
+
 ```
+did not move based on cues, different cues but same directions
+look at difference between 12 and 18 movement
+proportion moved tws and proportion moved away
 
 
-```{r}
 glm_bbinom <- glmmTMB(move_as_expected ~ temp_grp + avg_length_m, family = betabinomial(link = "logit"), data = nudi_data)
 simulateResiduals(glm_bbinom)%>%
   plot()
 #treats temperature and length separately
 
-```
 
-
-```{r}
 # Fit Zero-Inflated Binomial Model
 glm_zib <- glmmTMB(direction_binom ~ temp_grp + avg_length_m, 
                    family = binomial(link = "logit"), 
@@ -68,16 +82,9 @@ summary(glm_zib)
 simulateResiduals(glm_zib) %>% 
   plot()
 
-```
-
-
-
-```{r}
 AIC(glm_bbinom, glm_binom, glm_zib)
-```
 
-```{r}
-#only AIC for binom, which glm_binom AIC = 69.11
+#only AIC for binom
 
 summary(glm_binom)
 
@@ -85,10 +92,7 @@ summary(glm_binom)
 
 #Size effect: Similarly, the p-value for avg_length_m is greater than 0.05 suggesting that the size of the nudibranchs does not significantly impact their direction of movement.
 
-```
 
-
-```{r}
 #modeling both the main effects of each variable and their interaction: modeling the effect of temperature, the effect of size, and how the effect of temperature changes depending on the size of the nudibranch
 
 # Fit the model with interaction between temperature and body size
@@ -100,9 +104,6 @@ simulateResiduals(glm_binom_int)%>%
 summary(glm_binom_int)
 
 
-```
-
-```{r}
 glm_bbinom_int <- glmmTMB(move_as_expected ~ temp_grp * avg_length_m, family = betabinomial(link = "logit"), data = nudi_data)
 
 simulateResiduals(glm_bbinom_int)%>%
@@ -111,10 +112,7 @@ simulateResiduals(glm_bbinom_int)%>%
 
 summary(glm_binom_int)
 
-```
 
-
-```{r}
 # Fit Zero-Inflated Binomial Model
 glm_zib_int <- glmmTMB(direction_binom ~ temp_grp * avg_length_m, 
                    family = binomial(link = "logit"), 
@@ -127,35 +125,8 @@ summary(glm_zib_int)
 simulateResiduals(glm_zib_int) %>% 
   plot()
 
-```
 
-
-```{r}
 AIC(glm_bbinom_int, glm_binom_int, glm_zib_int)
 
-#interaction made this worse somehow: AIC for glm_binom_int = 70.03
-```
-
-
-```{r}
-# Final chosen model (based on AIC)
-glm_binom_final <- glmmTMB(move_as_expected ~ temp_grp + avg_length_m, family = binomial(link = "logit"), data = nudi_data)
-
-# Check model summary
-summary(glm_binom_final)
-
-# Check AIC
-AIC(glm_binom_final)
-
-# Visualize effects
-effect_temp <- ggeffect(glm_binom_final, terms = "temp_grp")
-plot(effect_temp)
-
-effect_size <- ggeffect(glm_binom_final, terms = "avg_length_m")
-plot(effect_size)
-```
-
-
-
-
+#interaction made this worse somehow: AIC for
 
