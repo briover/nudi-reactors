@@ -1,0 +1,246 @@
+---
+title: "statistical_tests_vel"
+output: html_document
+date: "2024-12-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(here) #loading data
+library(ggplot2) #plotting data
+library(readxl) #importing excel files
+library(sf) #for spatial data
+library(cowplot)
+library(rnaturalearth)
+library(ggspatial)
+library(dplyr)
+library(tidyverse)
+library(circular)
+library(knitr)
+library(glmmTMB)
+library(DHARMa)
+library(ggeffects)
+library(performance)
+library(car)
+library(mgcv)
+library(fitdistrplus)
+library(goft)
+library(gamlss)
+```
+
+```{r}
+nudi_data <- read.csv("./clean_data/combinedraw.csv")
+nudi_data$trial_type[nudi_data$trial_type=="conspecific "] <- "conspecific"
+
+#temp group as factor
+nudi_data_factor <- read.csv("./clean_data/combinedraw.csv")%>%
+  mutate(temp_grp = as.factor(temp_grp))
+nudi_data_factor$trial_type[nudi_data_factor$trial_type=="conspecific "] <- "conspecific"
+  
+
+str(nudi_data_factor)
+
+```
+```{r}
+#temp group as factor
+nudi_data_factor <- read.csv("./clean_data/combinedraw.csv")%>%
+  mutate(temp_grp = as.factor(temp_grp))
+nudi_data_factor$trial_type[nudi_data_factor$trial_type=="conspecific "] <- "conspecific"
+
+
+#fit model into gamma as interaction (temp and length)
+nudi_gamma_factor_times <- glmmTMB(mean_vel ~ temp_grp * avg_length_m, family = Gamma(link = "log"), data = nudi_data_factor)
+summary(nudi_gamma_factor_times)
+#fit in plot
+simulateResiduals(nudi_gamma_factor_times)%>%
+  plot()
+
+#analysis: to examine  the effect ... how it effects we ran a generalized linear model using the glmmTMB packege (site package).(explain variables in there, used gamma ditribution) we checked whether it fitted (determine fit) we plotted the simul residuals using the dharma package (site dharma). R citing? no(all stat analyssi were  done in)
+#significance: there was a significant difference in mean velocity between the 18 degrees treatment group and the 12 degree treatment group (calculate st error)
+#est std effect size. both 14 and 16 did not sign differ from 12 see table
+#no sign interaction between 14 interactin with length
+```
+
+
+```{r fitting model}
+#fit model into gamma as independent variables (temp and length)
+nudi_gamma <- glmmTMB(mean_vel ~ temp_grp + avg_length_m, family = Gamma(link = "log"), data = nudi_data)
+summary(nudi_gamma)
+#fit in plot
+simulateResiduals(nudi_gamma)%>%
+  plot()
+
+#fit model into gamma as dependent variables (temp and length)
+nudi_gamma_times <- glmmTMB(mean_vel ~ temp_grp * avg_length_m, family = Gamma(link = "log"), data = nudi_data)
+summary(nudi_gamma_times)
+#fit in plot
+simulateResiduals(nudi_gamma_times)%>%
+  plot()
+```
+```{r fitting model when temp grp is a factor}
+#fit model into gamma as independent variables (temp and length)
+nudi_gamma_factor <- glmmTMB(mean_vel ~ temp_grp + avg_length_m, family = Gamma(link = "log"), data = nudi_data_factor)
+summary(nudi_gamma_factor)
+#fit in plot
+simulateResiduals(nudi_gamma_factor)%>%
+  plot()
+
+
+
+#fit model into gamma as dependent variables (temp and length)
+nudi_gamma_factor_times <- glmmTMB(mean_vel ~ temp_grp * avg_length_m, family = Gamma(link = "log"), data = nudi_data_factor)
+summary(nudi_gamma_factor_times)
+#fit in plot
+simulateResiduals(nudi_gamma_factor_times)%>%
+  plot()
+
+#analysis: to examine  the effect ... how it effects we ran a generalized linear model using the glmmTMB packege (site package).(explain variables in there, used gamma ditribution) we checked whether it fitted (determine fit) we plotted the simul residuals using the dharma package (site dharma). R citing? no(all stat analyssi were  done in)
+#significance: there was a significant difference in mean velocity between the 18 degrees treatment group and the 12 degree treatment group (calculate st error)
+#est std effect size. both 14 and 16 did not sign differ from 12 see table
+#no sign interaction between 14 interactin with length
+
+```
+
+
+```{r statistical tests dependent and independent}
+#compare the independent with the dependent model with anova
+anova(nudi_gamma, nudi_gamma_times, test = "Chisq")
+#AIC and BIC lower for dependent --> nudi_gamma_times fits best
+```
+
+```{r statistical tests dep and indep when temp is factor}
+#compare the independent with the dependent model with anova
+anova(nudi_gamma_factor, nudi_gamma_factor_times, test = "Chisq")
+#AIC and BIC lower for independent --> nudi_gamma_factor fits best
+```
+
+
+```{r statistical tests with dependent}
+#gamma model without temperature
+nudi_gamma_reducedtemp <- glmmTMB(mean_vel ~ avg_length_m, family = Gamma(link = "log"), data = nudi_data)
+
+#gamma model without length
+nudi_gamma_reducedlength <- glmmTMB(mean_vel ~ temp_grp, family = Gamma(link = "log"), data = nudi_data)
+
+#anova Chisquare with gamma models
+#The Chi-square test compares the log-likelihoods of nested models and assumes a Chi-square distribution under the null hypothesis.
+# Compare models 1.all three 2. without temp 3. without length
+anova(nudi_gamma_times, nudi_gamma_reducedlength,nudi_gamma_reducedtemp, test = "Chisq")
+#anova above shows that nudi_gamma_times explains the variance the best?
+#length is a strong predictor for average velocity, interaction temp * length is also significant: the effect of lenght on velocity depend on temperature
+
+anova(nudi_gamma_times, nudi_gamma_reducedtemp, test = "Chisq")
+anova(nudi_gamma_times, nudi_gamma_reducedlength, test = "Chisq")
+
+```
+```{r statistical tests with dependent when temp is factor}
+#gamma model without temperature
+nudi_gamma_factor_reducedtemp <- glmmTMB(mean_vel ~ avg_length_m, family = Gamma(link = "log"), data = nudi_data_factor)
+
+#gamma model without length
+nudi_gamma_factor_reducedlength <- glmmTMB(mean_vel ~ temp_grp, family = Gamma(link = "log"), data = nudi_data_factor)
+
+#anova Chisquare with gamma models
+#The Chi-square test compares the log-likelihoods of nested models and assumes a Chi-square distribution under the null hypothesis.
+# Compare models 1.all three 2. without temp 3. without length
+anova(nudi_gamma_factor_times, nudi_gamma_factor_reducedlength,nudi_gamma_factor_reducedtemp, test = "Chisq")
+#anova above shows that nudi_gamma_times explains the variance the best?
+#length is a strong predictor for average velocity, interaction temp * length is also significant: the effect of lenght on velocity depend on temperature
+```
+
+
+```{r statistical tests velocity with plus, account for them seperately}
+#linear model with all three variables
+lm_model_vel <- lm(mean_vel ~ temp_grp + avg_length_m, data = nudi_data)
+summary(lm_model_vel)
+#plot(lm_model_vel) 
+
+#linear model without temperature
+lm_model_reducedtemp <- lm(mean_vel ~ avg_length_m, data = nudi_data)
+summary(lm_model_reducedtemp)
+#plot(lm_model_reducedtemp)
+
+#linear model without length nudi
+lm_model_reducedleng <- lm(mean_vel ~ temp_grp, data = nudi_data)
+summary(lm_model_reducedleng)
+#plot(lm_model_reducedleng)
+
+#annova with linear models F-based
+#compare all three 3 lm, then wihtout temp, then without length
+anova(lm_model_vel, lm_model_reducedtemp, lm_model_reducedleng, test =  "F")
+anova(lm_model_vel, lm_model_reducedleng, test =  "F")
+anova(lm_model_vel, lm_model_reducedtemp, test =  "F")
+
+#annova with linear models Chisquare
+#compare all three 3 lm, then wihtout temp, then without length
+anova(lm_model_vel, lm_model_reducedtemp, lm_model_reducedleng, test =  "Chisq")
+anova(lm_model_vel, lm_model_reducedleng, test =  "Chisq")
+anova(lm_model_vel, lm_model_reducedtemp,  test =  "Chisq")
+
+#gamma model with all three variables
+nudi_gamma <- glmmTMB(mean_vel ~ temp_grp + avg_length_m, family = Gamma(link = "log"), data = nudi_data)
+summary(nudi_gamma)
+
+#gamma model without temperature
+nudi_gamma_reducedtemp <- glmmTMB(mean_vel ~ avg_length_m, family = Gamma(link = "log"), data = nudi_data)
+
+#gamma model without length
+nudi_gamma_reducedlength <- glmmTMB(mean_vel ~ temp_grp, family = Gamma(link = "log"), data = nudi_data)
+
+#annova Chisquare with gamma models
+# Compare models 1.all three 2. without temp 3. without length
+anova(nudi_gamma, nudi_gamma_reducedlength,nudi_gamma_reducedtemp, test = "Chisq")
+anova(nudi_gamma, nudi_gamma_reducedtemp, test = "Chisq")
+anova(nudi_gamma, nudi_gamma_reducedlength, test = "Chisq")
+
+```
+```{r statistical tests for velocity with times}
+
+#linear model with all three variables
+lm_model_vel_times <- lm(mean_vel ~ temp_grp * avg_length_m, data = nudi_data)
+summary(lm_model_vel_times)
+#plot(lm_model_vel_times) 
+
+#annova with linear models Chisquared
+#compare all three 3 lm, then wihtout temp, then without length
+anova(lm_model_vel_times, lm_model_reducedtemp, lm_model_reducedleng, test =  "Chisq")
+anova(lm_model_vel_times, lm_model_reducedleng, test =  "Chisq")
+anova(lm_model_vel_times, lm_model_reducedtemp, test =  "Chisq")
+
+#gamma model with all three variables
+nudi_gamma_times <- glmmTMB(mean_vel ~ temp_grp * avg_length_m, family = Gamma(link = "log"), data = nudi_data)
+summary(nudi_gamma_times)
+
+#gamma model without temperature
+nudi_gamma_reducedtemp <- glmmTMB(mean_vel ~ avg_length_m, family = Gamma(link = "log"), data = nudi_data)
+
+#gamma model without length
+nudi_gamma_reducedlength <- glmmTMB(mean_vel ~ temp_grp, family = Gamma(link = "log"), data = nudi_data)
+
+#anova Chisquare with gamma models
+#The Chi-square test compares the log-likelihoods of nested models and assumes a Chi-square distribution under the null hypothesis.
+# Compare models 1.all three 2. without temp 3. without length
+anova(nudi_gamma_times, nudi_gamma_reducedlength,nudi_gamma_reducedtemp, test = "Chisq")
+anova(nudi_gamma_times, nudi_gamma_reducedtemp, test = "Chisq")
+anova(nudi_gamma_times, nudi_gamma_reducedlength, test = "Chisq")
+
+
+
+```
+```{r}
+#test gamma model (dependent) to see if it fits
+simulateResiduals(nudi_gamma_times)%>%
+  plot()
+#yes!
+```
+```{r compar dependent and independent}
+#this shows that the dependent one is more applicable. so we should use nudi_gamma_times
+AIC(nudi_gamma, nudi_gamma_times)
+BIC(nudi_gamma, nudi_gamma_times)
+anova(nudi_gamma, nudi_gamma_times)
+```
+
