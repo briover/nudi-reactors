@@ -39,3 +39,36 @@ nudi_data_factor$trial_type[nudi_data_factor$trial_type=="conspecific "] <- "con
   
 ```
 
+```{r}
+#creating my own color palette for the different temp groups
+my_cols <- c("12" = "red", "14" = "darkblue","16" = "green", "18"= "yellow" )
+
+#boxplot mean velocity for different temperature groups without jitter
+boxplot_nudi <- ggplot(nudi_data_factor, aes(x=temp_grp, y=mean_vel, fill=temp_grp)) + 
+    geom_boxplot(alpha=0.3) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  labs(y = "Mean velocity (m/s)\n", x = "\nTemperature(°C)", 
+       color = "Treatment group (°C)", 
+       fill = "Treatment group(°C)") +
+  theme_classic()
+
+#with jitter
+boxplot_jitter_nudi <- ggplot(nudi_data_factor, aes(x=temp_grp, y=mean_vel, fill=temp_grp)) + 
+   geom_point(aes(colour = temp_grp), position = position_jitterdodge()) +
+    geom_boxplot(alpha=0.3) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  labs(y = "Mean velocity (m/s)\n", x = "\nTemperature(°C)", 
+       color = "Treatment group(°C)", 
+       fill = "Treatment group(°C)") +
+  theme_classic()
+
+
+#save plots as pdf
+ggsave(plot = boxplot_nudi, filename = here("luca_scripts","boxplot_nudi.pdf"), width = 6, height = 4)
+ggsave(plot = boxplot_jitter_nudi, filename = here("luca_scripts","boxplot_jitter_nudi.pdf"), width = 6, height = 4)
+
+
+```
+
