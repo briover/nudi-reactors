@@ -1,5 +1,5 @@
 ---
-title: "graph_velocity"
+title: "Clean_luca"
 output: html_document
 date: "2024-12-07"
 ---
@@ -9,10 +9,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-library(here) #loading data
-library(ggplot2) #plotting data
-library(readxl) #importing excel files
-library(sf) #for spatial data
+#loading in all necessary packages
+
+library(here) 
+library(ggplot2) 
+library(readxl) 
+library(sf) 
 library(cowplot)
 library(rnaturalearth)
 library(ggspatial)
@@ -32,7 +34,7 @@ library(gamlss)
 ```
 
 ```{r}
-#load in data, change temperature to factor, change extra space in conspecific
+#load in data, change temperature to factor, remove extra space in conspecific
 nudi_data_factor <- read.csv("./clean_data/combinedraw.csv")%>%
   mutate(temp_grp = as.factor(temp_grp))
 nudi_data_factor$trial_type[nudi_data_factor$trial_type=="conspecific "] <- "conspecific"
@@ -40,6 +42,33 @@ nudi_data_factor$trial_type[nudi_data_factor$trial_type=="conspecific "] <- "con
 ```
 
 ```{r}
+#make linear model with nudi data with interaction between temp and length
+mod_nudi <- lm(mean_vel ~ temp_grp * avg_length_m, 
+             data = nudi_data_factor)
+
+#plot simulated residuals to see whether it fits
+simulateResiduals(mod_nudi)%>%
+  plot()
+
+#summary
+summary(mod_nudi)
+```
+
+
+```{r}
+#fit model into gamma as interaction (temp*length)
+nudi_gamma_factor_times <- glmmTMB(mean_vel ~ temp_grp * avg_length_m, family = Gamma(link = "log"), data = nudi_data_factor)
+
+#fit simulated residuals in plot
+simulateResiduals(nudi_gamma_factor_times)%>%
+  plot()
+
+#summarize for the stats
+summary(nudi_gamma_factor_times)
+```
+
+```{r}
+
 #creating my own color palette for the different temp groups
 my_cols <- c("12" = "red", "14" = "darkblue","16" = "green", "18"= "yellow" )
 
@@ -64,6 +93,8 @@ boxplot_jitter_nudi <- ggplot(nudi_data_factor, aes(x=temp_grp, y=mean_vel, fill
        fill = "Treatment group(°C)") +
   theme_classic()
 
+boxplot_nudi
+boxplot_jitter_nudi
 
 #save plots as pdf
 ggsave(plot = boxplot_nudi, filename = here("luca_scripts","boxplot_nudi.pdf"), width = 6, height = 4)
@@ -71,4 +102,3 @@ ggsave(plot = boxplot_jitter_nudi, filename = here("luca_scripts","boxplot_jitte
 
 
 ```
-
