@@ -68,35 +68,40 @@ proportion moved tws and proportion moved away
 library(dplyr)
 library(ggplot2)
 
-# Summarize the data: Count nudibranchs that moved towards or away for each combination of trial_type, temp_grp, and direction_binom
+# Step 1: Summarize the data - Count nudibranchs that moved towards or away for each combination of trial_type, temp_grp, and direction_binom
 nudi_data_summary <- nudi_data %>%
   group_by(trial_type, temp_grp, direction_binom) %>%
-  summarise(count = n(), .groups = 'drop')
+  summarise(count = n(), .groups = 'drop')  # Count nudibranchs in each group
 
-# Calculate total number of nudibranchs in each trial_type and temp_grp
+# Step 2: Calculate total number of nudibranchs in each trial_type and temp_grp
 nudi_data_totals <- nudi_data %>%
   group_by(trial_type, temp_grp) %>%
-  summarise(total = n(), .groups = 'drop')
+  summarise(total = n(), .groups = 'drop')  # Calculate total number of nudibranchs
 
-# Join the summarized data with the total counts to calculate proportions
+# Step 3: Join the summarized data with the total counts to calculate proportions
 nudi_data_prop <- nudi_data_summary %>%
   left_join(nudi_data_totals, by = c("trial_type", "temp_grp")) %>%
   mutate(proportion = count / total)  # Calculate proportion for each direction
 
-# Ensure 'direction_binom' is a factor with appropriate levels
+# Step 4: Ensure that 'direction_binom' is a factor with appropriate levels (0 = Away, 1 = Towards)
 nudi_data_prop$direction_binom <- factor(nudi_data_prop$direction_binom, levels = c(0, 1))
 
-# Handle missing data for "towards" direction in case there are no nudibranchs for that direction
+# Step 5: Handle missing data for "towards" direction (if no nudibranchs moved in that direction)
 nudi_data_prop_complete <- nudi_data_prop %>%
-  complete(trial_type, temp_grp, direction_binom, fill = list(count = 0))  # Ensures missing rows are added
+  complete(trial_type, temp_grp, direction_binom, fill = list(count = 0))  # Add missing rows
 
-# Set any NA values in proportion to 0 (this handles cases where count is 0 or missing)
+# Step 6: Set any NA values in proportion to 0 (if there are no nudibranchs for a particular direction)
 nudi_data_prop_complete$proportion[is.na(nudi_data_prop_complete$proportion)] <- 0
 
-# Get the maximum proportion to set the y-axis limit
-y_max <- max(nudi_data_prop_complete$proportion, na.rm = TRUE)
+# Step 7: Generate the summary table with proportions
+summary_table <- nudi_data_prop_complete %>%
+  pivot_wider(names_from = direction_binom, values_from = proportion, names_prefix = "Direction_") %>%
+  mutate(across(starts_with("Direction_"), ~round(.x, 3)))  # Round proportions for clarity
 
-# Create the bar chart with the correct facet and fixed y-axis
+# View the summary table to check counts and proportions
+print(summary_table)
+
+# Step 8: Create the plot
 plot_rxn_probs <- ggplot(nudi_data_prop_complete, aes(x = factor(temp_grp), y = proportion, fill = factor(direction_binom))) +
   geom_bar(stat = "identity", position = "dodge") +  # dodge bars so they do not overlap
   facet_wrap(~ trial_type, scales = "free_y",  
@@ -108,7 +113,7 @@ plot_rxn_probs <- ggplot(nudi_data_prop_complete, aes(x = factor(temp_grp), y = 
     fill = "Direction"
   ) +
   scale_fill_manual(values = c("0" = "lightblue", "1" = "navyblue"), labels = c("Away", "Towards")) +  # Color customization
-  scale_y_continuous(limits = c(0, y_max), expand = c(0, 0)) +  # Fixed y-axis scale across both graphs, ensuring bars touch the x-axis
+  scale_y_continuous(expand = c(0, 0)) +  # Fixed y-axis scale across both graphs
   scale_x_discrete(expand = c(0.2, 0)) +  # Increase space between the categories on the x-axis
   theme_minimal() +
   theme(
@@ -123,6 +128,9 @@ plot_rxn_probs <- ggplot(nudi_data_prop_complete, aes(x = factor(temp_grp), y = 
     strip.text = element_text(size = 12, face = "bold", margin = margin(b = 20))  # Add space between facet labels and graph
   )
 
+# Display the plot
+print(plot_rxn_probs)
+
 ```
 
 
@@ -133,6 +141,53 @@ ggsave(plot = plot_rxn_probs, filename = here("bri_code", "plot_rxn_probs.png"),
 
 
 
+```{r}
+# Summarize the data to calculate the overall proportions of "towards" and "away" for each temp_grp
+nudi_data_summary_overall <- nudi_data %>%
+  group_by(temp_grp, direction_binom) %>%
+  summarise(count = n(), .groups = 'drop')
+
+# Calculate total number of nudibranchs in each temp_grp
+nudi_data_totals_overall <- nudi_data %>%
+  group_by(temp_grp) %>%
+  summarise(total = n(), .groups = 'drop')
+
+# Join the summarized data with the total counts to calculate proportions
+nudi_data_prop_overall <- nudi_data_summary_overall %>%
+  left_join(nudi_data_totals_overall, by = "temp_grp") %>%
+  mutate(proportion = count / total)  # Calculate proportion for each direction
+
+# Ensure 'direction_binom' is a factor with appropriate levels
+nudi_data_prop_overall$direction_binom <- factor(nudi_data_prop_overall$direction_binom, levels = c(0, 1))
+
+# Get the maximum proportion to set the y-axis limit
+y_max <- max(nudi_data_prop_overall$proportion, na.rm = TRUE)
+
+# Create the plot showing overall movement for each temp_grp
+ggplot(nudi_data_prop_overall, aes(x = factor(temp_grp), y = proportion, fill = factor(direction_binom))) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +  # Bar chart with dodged bars for direction and adjusted bar width
+  labs(
+    title = "",
+    x = "Treatment Group (°C)",
+    y = "Proportion of Nudibranchs",
+    fill = "Direction"
+  ) +
+  scale_fill_manual(values = c("0" = "lightblue", "1" = "navyblue"), labels = c("Away", "Towards")) +  # Color customization
+  scale_y_continuous(limits = c(0, y_max), expand = c(0, 0)) +  # Fixed y-axis scale across both graphs, ensuring bars touch the x-axis
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),  # Rotate x-axis labels for readability
+    axis.text.y = element_text(vjust = 1),  # Adjust vertical alignment of y-axis text
+    panel.grid.major = element_blank(),  # Remove major gridlines
+    panel.grid.minor = element_blank(),  # Remove minor gridlines
+    axis.line = element_line(color = "black", size = 0.5),  # Add axis lines for both x and y axes
+    axis.ticks = element_line(color = "black", size = 0.5),  # Add ticks to both x and y axes
+    axis.title.x = element_text(margin = margin(t = 10)),  # Add space between x-axis labels and numbers
+    axis.title.y = element_text(margin = margin(r = 10)),  # Add space between y-axis labels and numbers
+    strip.text = element_text(size = 12, face = "bold", margin = margin(b = 15))  # Add space between facet labels and graph
+  )
+
+```
 
 
 
