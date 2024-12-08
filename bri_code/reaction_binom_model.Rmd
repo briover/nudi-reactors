@@ -158,7 +158,7 @@ nudi_data_prop_overall$direction_binom <- factor(nudi_data_prop_overall$directio
 ggplot(nudi_data_prop_overall, aes(x = factor(temp_grp), y = proportion, fill = factor(direction_binom))) +
   geom_bar(stat = "identity", position = "dodge") +  # Bar chart with dodged bars for direction
   labs(
-    title = "Overall Movement Towards or Away from Cue Source",
+    title = "All Cues",
     x = "Temperature Group (°C)",
     y = "Proportion of Nudibranchs",
     fill = "Direction"
