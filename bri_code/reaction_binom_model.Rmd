@@ -72,6 +72,7 @@ library(ggplot2)
 nudi_data_summary <- nudi_data %>%
   group_by(trial_type, temp_grp, direction_binom) %>%
   summarise(count = n(), .groups = 'drop')  # Count nudibranchs in each group
+print(nudi_data_summary)
 
 # Step 2: Calculate total number of nudibranchs in each trial_type and temp_grp
 nudi_data_totals <- nudi_data %>%
