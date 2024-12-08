@@ -1,0 +1,91 @@
+---
+title: "forloop_tryout"
+output: html_document
+date: "2024-12-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(here) #loading data
+library(ggplot2) #plotting data
+library(readxl) #importing excel files
+library(sf) #for spatial data
+library(cowplot)
+library(rnaturalearth)
+library(ggspatial)
+library(dplyr)
+library(tidyverse)
+library(circular)
+library(knitr)
+library(glmmTMB)
+library(DHARMa)
+library(ggeffects)
+library(performance)
+library(car)
+library(mgcv)
+library(fitdistrplus)
+library(goft)
+library(gamlss)
+```
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Read and clean the data
+nudi_data_factor <- read.csv("./clean_data/combinedraw.csv") %>%
+  mutate(temp_grp = as.factor(temp_grp))
+
+# Correct the typo in trial_type
+nudi_data_factor$trial_type[nudi_data_factor$trial_type == "conspecific "] <- "conspecific"
+
+# Separate data for "conspecific" and "predator"
+conspecific_data <- nudi_data_factor %>%
+  filter(trial_type == "conspecific") %>%
+  group_by(temp_grp, direction_binom) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  group_by(temp_grp) %>%
+  mutate(proportion = count / sum(count))
+
+predator_data <- nudi_data_factor %>%
+  filter(trial_type == "predator") %>%
+  group_by(temp_grp, direction_binom) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  group_by(temp_grp) %>%
+  mutate(proportion = count / sum(count))
+
+# Plot for "conspecific" trial type
+conspecific_plot <- ggplot(conspecific_data, aes(x = temp_grp, y = proportion, fill = as.factor(direction_binom))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Proportions of Directional Binom for Conspecific Trial Type",
+       x = "Temperature Group",
+       y = "Proportion",
+       fill = "Directional Binom") +
+  scale_fill_manual(values = c("blue", "orange"), labels = c("Toward", "Away")) +
+  theme_minimal()
+
+# Plot for "predator" trial type
+predator_plot <- ggplot(predator_data, aes(x = temp_grp, y = proportion, fill = as.factor(direction_binom))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Proportions of Directional Binom for Predator Trial Type",
+       x = "Temperature Group",
+       y = "Proportion",
+       fill = "Directional Binom") +
+  scale_fill_manual(values = c("blue", "orange"), labels = c("Toward", "Away")) +
+  theme_minimal()
+
+# Print the plots
+print(conspecific_plot)
+print(predator_plot)
+```
+
+```{r}
+binglm <- glmmTMB(direction_binom ~ temp_grp * avg_length_m, family = binomial(link = "logit"), data = nudi_data_factor)
+summary(binglm)
+```
+
+
