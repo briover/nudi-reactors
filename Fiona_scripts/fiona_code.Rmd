@@ -510,3 +510,91 @@ ggsave("./pred_avg_plots.png", plot = plot_avgsp, width = 12, height = 12, dpi =
 
 
 
+#mess around code 
+
+```{r}
+#making the tables - full table
+
+library(knitr)
+library(kableExtra)
+library(dplyr)
+
+
+table_data <- read.csv("./raw_data/table_data.csv") %>%
+  filter(complete.cases(.))  # Remove rows with NA values
+
+library(knitr)
+library(kableExtra)
+library(dplyr)  # to use rename()
+
+table_data <- table_data %>%
+  rename("ID Number" = nudi_num, 
+         "Size (m)" = avg_length_m, 
+         "Size SD (m)" = standard_dev, 
+         "Temperature Group (°C) " = temp_grp, 
+         "Conspecific T/A" = con_T.A, 
+         "Predator T/A" = pred_T.A, 
+         "Conspecific Mean Velocity (m/s)" = mean_vel_con, 
+         "Predator Mean Velocity (m/s)" = mean_vel_pred, 
+         "SD Conspecific velocity (m/s)" = sd_vel_con, 
+         "SD Predator velocity (m/s)" = sd_vel_pred,
+         "Mean Angle Conspecific (°)" = mean_angle_con,
+         "SD Conspecific Angle (°)" = sd_angle_con,
+         "Mean Angle Predator (°)" = mean_angle_pred,
+         "SD Angle Predator (°)" = sd_angle_pred)
+
+table_data %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+
+  # if not already installed
+library(webshot2)
+library(kableExtra)
+
+
+# Create the HTML version of the table
+table_html <- table_data %>%
+  kable("html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+# Save the HTML file to your working directory
+save_kable(table_html, "my_table.html")
+
+webshot("my_table.html", "my_table.png")
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

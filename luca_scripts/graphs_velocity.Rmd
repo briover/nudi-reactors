@@ -72,3 +72,24 @@ ggsave(plot = boxplot_jitter_nudi, filename = here("luca_scripts","boxplot_jitte
 
 ```
 
+```{r}
+levels(nudi_data_factor$temp_grp)
+```
+
+
+
+nudi_cons <- nudi_data_factor[nudi_data_factor$trial_type=="conspecific",]
+nudi_pred <- nudi_data_factor[nudi_data_factor$trial_type=="predator",]
+
+bin_con <- glmmTMB(direction_binom ~ temp_grp * avg_length_m, family = binomial(link = "logit"), data = nudi_cons)
+simulateResiduals(bin_con)%>%
+  plot()
+
+binglm <- glmmTMB(direction_binom ~ temp_grp * avg_length_m, family = binomial(link = "logit"), data = nudi_data_factor)
+
+vif(bin_con)
+
+#summary(glm_binom)
+summary(bin_con)
+```
+

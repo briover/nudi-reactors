@@ -65,6 +65,13 @@ simulateResiduals(nudi_gamma_factor_times)%>%
 
 #summarize for the stats
 summary(nudi_gamma_factor_times)
+
+# Extract the coefficients
+coef_table <- as.data.frame(summary(nudi_gamma_factor_times)$coefficients$cond)
+
+# Save the table as a CSV file
+write.csv(coef_table, "nudi_gamma_factor_times_coefficients.csv", row.names = TRUE)
+write.csv(coef_table, "nudi_gamma_factor_times_coefficients_false.csv", row.names = FALSE)
 ```
 
 ```{r}
