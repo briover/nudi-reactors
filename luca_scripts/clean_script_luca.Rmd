@@ -38,7 +38,7 @@ library(gamlss)
 nudi_data_factor <- read.csv("./clean_data/combinedraw.csv")%>%
   mutate(temp_grp = as.factor(temp_grp))
 nudi_data_factor$trial_type[nudi_data_factor$trial_type=="conspecific "] <- "conspecific"
-  
+
 ```
 
 ```{r}
@@ -102,3 +102,21 @@ ggsave(plot = boxplot_jitter_nudi, filename = here("luca_scripts","boxplot_jitte
 
 
 ```
+
+```{r}
+#print citations fro packages
+print(citation("DHARMa"), style = "text")
+print(citation("glmmTMB"), style = "text")
+citation()
+
+```
+
+```{r}
+#mean velocity per treatment group
+mean(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="12"])
+mean(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="14"])
+mean(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="16"])
+mean(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="18"])
+```
+
+
