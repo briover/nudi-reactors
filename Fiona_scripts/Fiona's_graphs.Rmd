@@ -28,3 +28,232 @@ plot(pressure)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+library(here) #loading data
+library(ggplot2) #plotting data
+library(readxl) #importing excel files
+library(sf) #for spatial data
+library(cowplot)
+library(rnaturalearth)
+library(ggspatial)
+library(dplyr)
+library(tidyverse)
+library(circular)
+
+nudi_con <- read.csv("./raw_data/rawcons.csv")
+trial_data <- read.csv("./raw_data/rawtrialdata.csv")
+nudi_preds <- read.csv("./raw_data/rawpred.csv")
+```
+
+```{r}
+cleantrialcons <- trial_data %>%
+  filter(trial_type == "conspecific") %>%
+  select(nudi_id, treatment_group)
+
+
+clean_con12 <- nudi_con%>%
+  filter(temp_grp == 12) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+ avg12 <- clean_con12 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+ 
+clean_con14 <- nudi_con%>%
+  filter(temp_grp == 14) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+ avg14 <- clean_con14 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+ 
+ clean_con16 <- nudi_con%>%
+  filter(temp_grp == 16) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+avg16 <- clean_con16 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+ 
+ clean_con18 <- nudi_con%>%
+  filter(temp_grp == 18) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+ avg18 <- clean_con18 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+ nudi_pred <- nudi_preds%>%
+  rename(temp_grp = temp)
+
+clean_pred12 <- nudi_pred%>%
+  filter(temp_grp == 12) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+ avg12p <- clean_pred12 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+ 
+clean_pred14 <- nudi_pred%>%
+  filter(temp_grp == 14) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+ avg14p <- clean_pred14 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+ 
+ clean_pred16 <- nudi_pred%>%
+  filter(temp_grp == 16) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+avg16p <- clean_pred16 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+ 
+ 
+ clean_pred18 <- nudi_pred%>%
+  filter(temp_grp == 18) %>%
+  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  na.omit()
+
+ avg18p <- clean_pred18 %>%
+   group_by(nudi_num) %>%
+   summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
+```
+
+```{r}
+#four panel pred plot results
+create_circular_plot <- function(data, color, title, base_radius = 4, point_alpha = 0.5, point_size = 5) {
+  # Create a data frame for the circular frame
+  circle_data <- data.frame(
+    mean_angle = seq(0, 360, by = 1),  # Full circle
+    y = base_radius                    # Base radius of the circle
+  )
+
+  ggplot(data, aes(x = mean_angle, y = base_radius)) +
+    geom_point(size = point_size, alpha = point_alpha, fill = color, color = "black", shape = 21) +
+    geom_path(data = circle_data, aes(x = mean_angle, y = y), color = "black", size = 0.5) +
+    coord_polar(theta = "x", start = pi/2, clip = "off") +
+    scale_x_continuous(
+      breaks = c(0, 90, 180, 270),
+      labels = c("0°", "90°", "180°", "270°")
+    ) +
+    # Slightly reduce the upper limit to bring labels closer to the circle
+    scale_y_continuous(limits = c(0, 4.1)) +
+    labs(title = title, x = "Mean Angular Movement (°)", y = NULL) +
+    theme_minimal() +
+    theme(
+      axis.title.y = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks.y = element_blank(),
+      panel.grid = element_blank(),
+      plot.margin = unit(c(1, 1, 1, 1), "cm"),
+      # Adjust margins of x-axis text to move labels inward
+      axis.text.x = element_text(margin = margin(-10, 0, 0, 0), size = 14),  # Increase axis text size
+      plot.title = element_text(size = 16, face = "bold"),                   # Increase title size
+      axis.title.x = element_text(size = 14)                                # Increase axis title size
+    )
+}
+
+# Create individual plots for each temperature group
+library(patchwork) # Make sure this is called
+
+# Create individual plots (should all be ggplot objects)
+plot_12 <- create_circular_plot(avg12p, "red", "12°C")
+plot_14 <- create_circular_plot(avg14p, "blue", "14°C")
+plot_16 <- create_circular_plot(avg16p, "green", "16°C")
+plot_18 <- create_circular_plot(avg18p, "orange", "18°C")
+
+# Combine them
+four_panel_plot <- (plot_12 | plot_14) / (plot_16 | plot_18)
+
+# Display
+four_panel_plot
+
+
+# Save the combined plot if desired
+ggsave("four_panel_plot_pred_results.png", plot = four_panel_plot, width = 12, height = 12, dpi = 300)
+
+```
+
+```{r}
+create_circular_plot <- function(data, color, title, base_radius = 4, point_alpha = 0.5, point_size = 5) {
+  # Create a data frame for the circular frame
+  circle_data <- data.frame(
+    mean_angle = seq(0, 360, by = 1),  # Full circle
+    y = base_radius                    # Base radius of the circle
+  )
+
+  ggplot(data, aes(x = mean_angle, y = base_radius)) +
+    geom_point(size = point_size, alpha = point_alpha, fill = color, color = "black", shape = 21) +
+    geom_path(data = circle_data, aes(x = mean_angle, y = y), color = "black", size = 0.5) +
+    coord_polar(theta = "x", start = pi/2, clip = "off") +
+    scale_x_continuous(
+      breaks = c(0, 90, 180, 270),
+      labels = c("0°", "90°", "180°", "270°")
+    ) +
+    # Slightly reduce the upper limit to bring labels closer to the circle
+    scale_y_continuous(limits = c(0, 4.1)) +
+    labs(title = title, x = "Mean Angular Movement (°)", y = NULL) +
+    theme_minimal() +
+    theme(
+      axis.title.y = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks.y = element_blank(),
+      panel.grid = element_blank(),
+      plot.margin = unit(c(1, 1, 1, 1), "cm"),
+      # Adjust margins of x-axis text to move labels inward
+      axis.text.x = element_text(margin = margin(-10, 0, 0, 0), size = 14),  # Increase axis text size
+      plot.title = element_text(size = 16, face = "bold"),                   # Increase title size
+      axis.title.x = element_text(size = 14)                                # Increase axis title size
+    )
+}
+
+# Create individual plots for each temperature group
+library(patchwork) # Make sure this is called
+
+# Create individual plots (should all be ggplot objects)
+plot_12 <- create_circular_plot(avg12, "red", "12°C")
+plot_14 <- create_circular_plot(avg14, "blue", "14°C")
+plot_16 <- create_circular_plot(avg16, "green", "16°C")
+plot_18 <- create_circular_plot(avg18, "orange", "18°C")
+
+# Combine them
+four_panel_plot_c <- (plot_12 | plot_14) / (plot_16 | plot_18)
+
+# Display
+four_panel_plot_c
+
+
+# Save the combined plot if desired
+ggsave("four_panel_plot_cons_results.png", plot = four_panel_plot_c, width = 12, height = 12, dpi = 300)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
