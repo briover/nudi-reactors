@@ -124,6 +124,27 @@ mean(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="12"])
 mean(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="14"])
 mean(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="16"])
 mean(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="18"])
+
+#all boxplot values
+summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="12"])
+summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="14"])
+summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="16"])
+summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="18"])
+```
+```{r}
+#trying out boxplot with residuals of gamma model
+
+model <- glmmTMB(mean_vel ~ avg_length_m, family = Gamma(link = "log"), data = nudi_data_factor)
+nudi_data_factor$residuals <- residuals(model, type = "response")
+ggplot(nudi_data_factor, aes(x = temp_grp, y = residuals, fill = temp_grp)) +
+    geom_boxplot() +
+    labs(
+        title = "Boxplot of Residuals by Temperature Group",
+        x = "Temperature Group",
+        y = "Residuals (adjusted mean_vel)"
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none")
 ```
 
 
