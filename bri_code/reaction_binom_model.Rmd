@@ -53,8 +53,13 @@ glm_binom2 <- glmmTMB(direction_binom ~ temp_grp * avg_length_m + trial_type, fa
 simulateResiduals(glm_binom2)%>%
   plot()
 
-#summary(glm_binom)
+# Extract the coefficients directly from the model summary
+binom_table <- as.data.frame(summary(glm_binom2)$coefficients$cond)
+
 summary(glm_binom2)
+
+# Save the table as a CSV file
+write.csv(binom_table, "bri_code/binom_table.csv", row.names = TRUE)
 
 
 ```
