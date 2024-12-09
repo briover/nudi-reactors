@@ -527,7 +527,7 @@ library(knitr)
 library(kableExtra)
 library(dplyr)  # to use rename()
 
-table_data <- table_data %>%
+all_table <- table_data %>%
   rename("ID Number" = nudi_num, 
          "Size (m)" = avg_length_m, 
          "Size SD (m)" = standard_dev, 
@@ -543,25 +543,13 @@ table_data <- table_data %>%
          "Mean Angle Predator (°)" = mean_angle_pred,
          "SD Angle Predator (°)" = sd_angle_pred)
 
-table_data %>%
+all_table %>%
   kable() %>%
   kable_styling(bootstrap_options = c("striped", "hover"))
 
 
   # if not already installed
-library(webshot2)
-library(kableExtra)
-
-
-# Create the HTML version of the table
-table_html <- table_data %>%
-  kable("html") %>%
-  kable_styling(bootstrap_options = c("striped", "hover"))
-
-# Save the HTML file to your working directory
-save_kable(table_html, "my_table.html")
-
-webshot("my_table.html", "my_table.png")
+write.csv("./all_table.csv")
 
 
 
