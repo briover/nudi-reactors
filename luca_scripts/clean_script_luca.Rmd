@@ -124,6 +124,64 @@ mean(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="12"])
 mean(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="14"])
 mean(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="16"])
 mean(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="18"])
+
+#all boxplot values + mean
+summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="12"])
+summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="14"])
+summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="16"]) 0.00141
+summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="18"]) 0.00146
+```
+```{r}
+#trying out boxplot with residuals of gamma model
+
+model <- glmmTMB(mean_vel ~ avg_length_m, family = Gamma(link = "log"), data = nudi_data_factor)
+nudi_data_factor$residuals <- residuals(model, type = "response")
+ggplot(nudi_data_factor, aes(x = temp_grp, y = residuals, fill = temp_grp)) +
+    geom_boxplot() +
+    labs(
+        title = "Boxplot of Residuals by Temperature Group",
+        x = "Temperature Group",
+        y = "Residuals (adjusted mean_vel)"
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none")
 ```
 
+
+```{r}
+# Calculate the average mean velocity for each temp_grp
+mean_values <- nudi_data_factor %>%
+  group_by(temp_grp) %>%
+  summarise(mean_mean_vel = mean(mean_vel, na.rm = TRUE))
+
+# Add the average points to the boxplot
+boxplot_nudi <- ggplot(nudi_data_factor, aes(x = temp_grp, y = mean_vel, fill = temp_grp)) + 
+  geom_boxplot(alpha = 0.3) +
+  scale_color_manual(values = my_cols) +
+  scale_fill_manual(values = my_cols) +
+  geom_point(data = mean_values, aes(x = temp_grp, y = mean_mean_vel), 
+             color = "black", size = 3, shape = 21, fill = "white") +
+  labs(
+    y = "Mean velocity (m/s)\n", 
+    x = "\nTemperature(°C)", 
+    color = "Treatment group (°C)", 
+    fill = "Treatment group(°C)"
+  ) +
+  theme_classic()
+
+boxplot_nudi
+```
+```{r}
+#trying out plotting variation in velocity being explained by length
+cor.test(nudi_data_factor$mean_vel, nudi_data_factor$avg_length_m)
+summary(lm(nudi_data_factor$mean_vel ~ nudi_data_factor$avg_length_m))
+plot(nudi_data_factor$avg_length_m, nudi_data_factor$mean_vel)
+
+summary(lm(nudi_data_factor$mean_vel ~ nudi_data_factor$temp_grp))
+
+model_variation <- lm(mean_vel ~ avg_length_m + temp_grp + trial_type + direction_binom, data = nudi_data_factor)
+summary(model_variation)
+anova(model_variation)
+
+```
 
