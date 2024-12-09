@@ -82,7 +82,6 @@ my_cols <- c("12" = "red", "14" = "darkblue","16" = "green", "18"= "yellow" )
 #boxplot mean velocity for different temperature groups without jitter
 boxplot_nudi <- ggplot(nudi_data_factor, aes(x=temp_grp, y=mean_vel, fill=temp_grp)) + 
     geom_boxplot(alpha=0.3) +
-  scale_color_manual(values = my_cols) +
   scale_fill_manual(values = my_cols) +
   labs(y = "Mean velocity (m/s)\n", x = "\nTemperature(°C)", 
        color = "Treatment group (°C)", 
@@ -128,11 +127,11 @@ mean(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="18"])
 #all boxplot values + mean
 summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="12"])
 summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="14"])
-summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="16"]) 0.00141
-summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="18"]) 0.00146
+summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="16"]) 
+summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="18"]) 
 ```
 ```{r}
-#trying out boxplot with residuals of gamma model
+#trying out boxplot with residuals of gamma model REMOVE THIS
 
 model <- glmmTMB(mean_vel ~ avg_length_m, family = Gamma(link = "log"), data = nudi_data_factor)
 nudi_data_factor$residuals <- residuals(model, type = "response")
@@ -183,5 +182,28 @@ model_variation <- lm(mean_vel ~ avg_length_m + temp_grp + trial_type + directio
 summary(model_variation)
 anova(model_variation)
 
+nudi_variation <- glmmTMB(mean_vel ~ avg_length_m, family = Gamma(link = "log"), data = nudi_data_factor)
+
+#fit simulated residuals in plot
+simulateResiduals(model_variation)%>%
+  plot()
+simulateResiduals(nudi_variation)%>%
+  plot()
+
+```
+```{r}
+#plot vel lenght
+nudi_vel_length <- ggplot(nudi_data_factor, aes(x= avg_length_m, y = mean_vel)) +
+  geom_point(size = 2) +
+  labs(
+    y = "Mean velocity (m/s)\n", 
+    x = "\nAverage length (m)") +
+  theme_classic() +
+  geom_smooth(method = "glm", color = "darkgrey", fill = "lightgrey")
+ggsave(plot = nudi_vel_length, filename = here("luca_scripts","lm_length_vel.pdf"), width = 6, height = 4)
+nudi_vel_length
+
+#fill = gray bars = st error around the line polygon: represent se of our line
+#colour is for points
 ```
 
