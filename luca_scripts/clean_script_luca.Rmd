@@ -178,5 +178,10 @@ summary(lm(nudi_data_factor$mean_vel ~ nudi_data_factor$avg_length_m))
 plot(nudi_data_factor$avg_length_m, nudi_data_factor$mean_vel)
 
 summary(lm(nudi_data_factor$mean_vel ~ nudi_data_factor$temp_grp))
+
+model_variation <- lm(mean_vel ~ avg_length_m + temp_grp + trial_type + direction_binom, data = nudi_data_factor)
+summary(model_variation)
+anova(model_variation)
+
 ```
 
