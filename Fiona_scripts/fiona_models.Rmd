@@ -32,7 +32,7 @@ combinedraw <- rbind(rawcons, rawpreds) %>%
   group_by(nudi_num, temp_grp, trial_type) %>%
   summarise(
     mean_angle = mean(fixdeg, na.rm = TRUE),
-    sd_angle = sd(fixdeg, na.rm = TRUE), # Calculate standard deviation for mean_angle
+    sd_angle = sd(fixdeg, na.rm = TRUE),
     mean_vel = mean(v_ms, na.rm = TRUE),
     sd_vel = sd(v_ms, na.rm = TRUE)      # Calculate standard deviation for mean_vel
   ) %>%
@@ -59,4 +59,5 @@ nudi_data_nospaces_xl <- nudi_data_nospaces %>%
 
 write.csv(nudi_data_nospaces_xl, "./clean_data/nudivelcorrected.csv")
 ```
+
 

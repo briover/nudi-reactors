@@ -1,0 +1,8 @@
+interaction_of,estimate_se,z_value,pr,df
+Treatment group 14 ,-1.02  +/-  0.55,-1.86,0.064,"3, 44"
+Treatment group 16 ,-0.53  +/-  0.64,-0.83,0.407,"3, 44"
+Treatment group 18 ,-0.94  +/-  0.38,-2.49,0.013,"3, 44"
+Average length (m),21.10  +/-  8.64,2.44,0.015,"1, 44"
+Treatment group 14 : Average length (m),23.99  +/-  16.35,1.47,0.142,"3, 44"
+Treatment group 16 : Average length (m),17.80  +/-  20.30,0.88,0.38,"3, 44"
+Treatment group 18 : Average length (m),22.93  +/-  13.21,1.74,0.083,"3, 44"
