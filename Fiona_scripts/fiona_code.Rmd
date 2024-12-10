@@ -215,6 +215,8 @@ print(four_panel_plot)
 # Optionally, save the combined plot
 ggsave("four_panel_plot_transparent_points_pred.png", plot = four_panel_plot, width = 12, height = 12, dpi = 300)
 ```
+
+
 ```{r}
 #attempting to move pred numbers closer to circles 
 # Predator plots
@@ -268,6 +270,8 @@ four_panel_plot
 ggsave("four_panel_plot_transparent_points_pred.png", plot = four_panel_plot, width = 12, height = 12, dpi = 300)
 
 ```
+
+
 ```{r}
 #moving con closer to circles 
 # Predator plots
@@ -280,7 +284,7 @@ create_circular_plot <- function(data, color, title, base_radius = 4, point_alph
 
   ggplot(data, aes(x = mean_angle, y = base_radius)) +
     geom_point(size = point_size, alpha = point_alpha, fill = color, color = "black", shape = 21) +
-    geom_path(data = circle_data, aes(x = mean_angle, y = y), color = "black", size = 1) +
+    geom_path(data = circle_data, aes(x = mean_angle, y = y), color = "black", size = 2) +
     coord_polar(theta = "x", start = pi/2, clip = "off") +
     scale_x_continuous(
       breaks = c(0, 90, 180, 270),
@@ -379,7 +383,7 @@ create_circular_plot <- function(data, title, base_radius = 8, point_alpha = 0.5
                color = "black",
                shape = 21) +
     geom_path(data = circle_data, aes(x = mean.angle, y = y), 
-              color = "black", size = 1) +
+              color = "black", size = 0.5) +
     coord_polar(theta = "x", start = pi/2, clip = "off") +
     scale_x_continuous(
       breaks = c(0, 90, 180, 270),

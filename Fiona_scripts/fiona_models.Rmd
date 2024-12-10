@@ -54,7 +54,8 @@ nudi_data_nospaces <- read.csv("clean_data/combinedraw.csv")%>%
 nudi_data_nospaces$trial_type[nudi_data_nospaces$trial_type=="conspecific "] <- "conspecific"
 
 nudi_data_nospaces_xl <- nudi_data_nospaces %>%
-  select(nudi_num, trial_type, mean_vel, sd_vel)
+  select(nudi_num, trial_type, mean_vel, sd_vel)%>%
+  filter(trial_type == "conspecific")
 
 write.csv(nudi_data_nospaces_xl, "./clean_data/nudivelcorrected.csv")
 ```
