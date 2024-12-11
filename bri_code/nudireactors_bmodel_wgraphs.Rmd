@@ -27,7 +27,7 @@ library(gamlss)
 ```{r}
 
 # Load the dataset and alter to be used in making the model
-nudi_data <- read.csv("clean_data/combinedraw.csv")%>%
+nudi_data <- read.csv("clean_data/Meyknecht_Over_Parker_MRNE475_2024_combinedraw.csv")%>%
   mutate(temp_grp = as.factor(temp_grp)) #change how the data is structured so that treatment group is considered a factor
 nudi_data$trial_type[nudi_data$trial_type=="conspecific "] <- "conspecific" #ensure all cue types are listed the same way
 # View the structure of the updated dataset to confirm changes:
@@ -50,7 +50,7 @@ binom_table <- as.data.frame(summary(glm_binom2)$coefficients$cond)
 summary(glm_binom2) #check data before exporting
 
 # Save the table as a CSV file
-write.csv(binom_table, "bri_code/binom_table.csv", row.names = TRUE)
+write.csv(binom_table, "bri_code/Meyknecht_Over_Parker_MRNE475_2024_binom_table.csv", row.names = TRUE)
 
 ```
  
@@ -129,7 +129,7 @@ print(summary_table)
 ```{r}
 #save plot to git folder
 
-ggsave(plot = plot_rxn_probs, filename = here("bri_code", "plot_rxn_probs.png"), bg = "white", width = 6, height = 4)
+ggsave(plot = plot_rxn_probs, filename = here("bri_code", "Meyknecht_Over_Parker_MRNE475_2024_plot_rxn_probs.png"), bg = "white", width = 6, height = 4)
 
 ```
  
