@@ -1,3 +1,27 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+C:/Users/LucaM/DS project work/NudiReactors/nudi-reactors/.gitignore="91FF2959"
+C:/Users/LucaM/DS project work/NudiReactors/nudi-reactors/bri_code/reaction_binom_model.Rmd="C22D5CE1"
+C:/Users/LucaM/DS project work/NudiReactors/nudi-reactors/luca_scripts/circular_graphs_luca.Rmd="E0E2C507"
+C:/Users/LucaM/DS project work/NudiReactors/nudi-reactors/luca_scripts/clean_script_luca.Rmd="316F420D"
+C:/Users/LucaM/DS project work/NudiReactors/nudi-reactors/luca_scripts/graphs_velocity.Rmd="C075FAFD"
+C:/Users/LucaM/DS project work/NudiReactors/nudi-reactors/luca_scripts/lucascripts.Rmd="32C0B3E9"
+C:/Users/LucaM/DS project work/NudiReactors/nudi-reactors/luca_scripts/paths_graph_luca.Rmd="58297EFC"
+C:/Users/LucaM/DS project work/NudiReactors/nudi-reactors/luca_scripts/statistics_velocity.Rmd="8E44BA69"
+C:/Users/LucaM/DS project work/NudiReactors/nudi-reactors/luca_scripts/tryout1_con.Rmd="D82F117F"
+C:/Users/LucaM/DS project work/NudiReactors/nudi-reactors/luca_scripts/tryout_binomial_shit.Rmd="5CCE1673"
+C:/Users/LucaM/DS project work/NudiReactors/nudi-reactors/luca_scripts/velocity_luca.Rmd="0CD97B08"
+C:/Users/LucaM/DS project work/NudiReactors/nudi-reactors/luca_scripts/velocity_luca2.Rmd="F8F7538D"
+C:/Users/LucaM/DS project work/NudiReactors/nudi-reactors/nudi_gamma_factor_times_coefficients.csv="E4C37223"
+C:/Users/LucaM/Rstudio BMSC/Scripts Rstudio/L08_TakeHomeChallenge.Rmd="909815A2"
+C:/Users/LucaM/Rstudio BMSC/Scripts Rstudio/Meyknecht_Luca_L06_takehome.Rmd="45CBD6E8"
+C:/Users/LucaM/Rstudio BMSC/Scripts Rstudio/Meyknecht_Luca_W02_takehome.Rmd="AFDBCB97"
+C:/Users/LucaM/Rstudio BMSC/Scripts Rstudio/W02_takeHomeChallenge.Rmd="A8AE443A"
+C:/Users/LucaM/Rstudio BMSC/Scripts Rstudio/meyknecht_luca_L08_takehome_challenge.Rmd="FED0B475"
+=======
+<<<<<<< HEAD
+>>>>>>> 3cd43c4e20c020ab1f7ab38ecb2a39c82f0e1d3b
 C:/Users/brian/Documents/Bamfield Fall 2024/DS-ADA/ADA/ADA_lecture/Completed R/over_brianna_L06_takehome Bri.Rmd="99CA17E8"
 C:/Users/brian/Documents/Bamfield Fall 2024/DS-ADA/ADA/ADA_lecture/Completed R/over_brianna_L08_takehome.Rmd="464B6FEE"
 C:/Users/brian/Documents/Bamfield Fall 2024/DS-ADA/ADA/ADA_lecture/Completed R/over_brianna_W02_takehome.Rmd="EAF2D92C"
@@ -10,3 +34,22 @@ C:/Users/brian/Documents/Bamfield Fall 2024/DS-ADA/DS/nudi-git/bri_code/pred_tri
 C:/Users/brian/Documents/Bamfield Fall 2024/DS-ADA/DS/nudi-git/bri_code/reaction_binom_model.Rmd="0997C19E"
 C:/Users/brian/Documents/Bamfield Fall 2024/DS-ADA/DS/nudi-git/bri_code/trial.Rmd="20CCDCF4"
 C:/Users/brian/Documents/Bamfield Fall 2024/DS-ADA/DS/nudi-git/clean_data/nudireactors_bmodel_wgraphs.Rmd="48D8065A"
+<<<<<<< HEAD
+=======
+=======
+C:/Users/Fiona/OneDrive/Documents/bamfield 2024/ADA/lectures/L02_Intro2Tidy_STUDENT.Rmd="41A434F5"
+C:/Users/Fiona/OneDrive/Documents/bamfield 2024/DS/Nudireactors Coding and Data/nudi-reactors/Fiona_scripts/Fiona's_graphs.Rmd="B4D7A9B6"
+C:/Users/Fiona/OneDrive/Documents/bamfield 2024/DS/Nudireactors Coding and Data/nudi-reactors/Fiona_scripts/fiona_models.Rmd="864F5866"
+C:/Users/Fiona/OneDrive/Documents/bamfield 2024/DS/Nudireactors Coding and Data/nudi-reactors/Fiona_scripts/fionatables.Rmd="3A5D91A0"
+C:/Users/Fiona/OneDrive/Documents/bamfield 2024/DS/Nudireactors Coding and Data/nudi-reactors/bri_code/reaction_binom_model.Rmd="731CD430"
+C:/Users/Fiona/OneDrive/Documents/bamfield 2024/DS/Nudireactors Coding and Data/nudi-reactors/clean_data/combinedraw.csv="BF3A0EBC"
+C:/Users/Fiona/OneDrive/Documents/bamfield 2024/DS/Nudireactors Coding and Data/nudi-reactors/clean_data/combinedrawsem.csv="48131F96"
+C:/Users/Fiona/OneDrive/Documents/bamfield 2024/DS/Nudireactors Coding and Data/nudi-reactors/luca_scripts/clean_script_luca.Rmd="89CEF94F"
+C:/Users/Fiona/OneDrive/Documents/bamfield 2024/DS/Nudireactors Coding and Data/nudi-reactors/luca_scripts/graphs_velocity.Rmd="8ADDAB10"
+C:/Users/Fiona/OneDrive/Documents/bamfield 2024/DS/Nudireactors Coding and Data/nudi-reactors/luca_scripts/paths_graph_luca.Rmd="282F4A84"
+C:/Users/Fiona/OneDrive/Documents/bamfield 2024/DS/Nudireactors Coding and Data/nudi-reactors/luca_scripts/statistics_velocity.Rmd="86C20BE0"
+C:/Users/Fiona/OneDrive/Documents/bamfield 2024/DS/Nudireactors Coding and Data/nudi-reactors/luca_scripts/velocity_luca.Rmd="189680E4"
+C:/Users/Fiona/OneDrive/Documents/bamfield 2024/DS/Nudireactors Coding and Data/nudi-reactors/luca_scripts/velocity_luca2.Rmd="2FD21631"
+>>>>>>> 93999a740e442642bedefee4634c782ad8c1ed83
+>>>>>>> 86028f590d39fc09a5f6184bdcad4876cee169c3
+>>>>>>> 3cd43c4e20c020ab1f7ab38ecb2a39c82f0e1d3b
