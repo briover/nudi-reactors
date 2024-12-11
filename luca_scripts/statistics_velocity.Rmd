@@ -8,12 +8,13 @@ date: "2024-12-06"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+This is a rough (not cleaned) Rmd file used for getting the velocity statistics, it outlines the process- for clean code see clean_script_luca
 
 ```{r}
-library(here) #loading data
-library(ggplot2) #plotting data
-library(readxl) #importing excel files
-library(sf) #for spatial data
+library(here) 
+library(ggplot2) 
+library(readxl) 
+library(sf) 
 library(cowplot)
 library(rnaturalearth)
 library(ggspatial)
@@ -33,11 +34,11 @@ library(gamlss)
 ```
 
 ```{r}
-nudi_data <- read.csv("./clean_data/combinedraw.csv")
+nudi_data <- read.csv("./clean_data/Meyknecht_Over_Parker_MRNE475_2024_combinedraw.csv")
 nudi_data$trial_type[nudi_data$trial_type=="conspecific "] <- "conspecific"
 
 #temp group as factor
-nudi_data_factor <- read.csv("./clean_data/combinedraw.csv")%>%
+nudi_data_factor <- read.csv("./clean_data/Meyknecht_Over_Parker_MRNE475_2024_combinedraw.csv")%>%
   mutate(temp_grp = as.factor(temp_grp))
 nudi_data_factor$trial_type[nudi_data_factor$trial_type=="conspecific "] <- "conspecific"
   
@@ -47,7 +48,7 @@ str(nudi_data_factor)
 ```
 ```{r}
 #temp group as factor
-nudi_data_factor <- read.csv("./clean_data/combinedraw.csv")%>%
+nudi_data_factor <- read.csv("./clean_data/Meyknecht_Over_Parker_MRNE475_2024_combinedraw.csv")%>%
   mutate(temp_grp = as.factor(temp_grp))
 nudi_data_factor$trial_type[nudi_data_factor$trial_type=="conspecific "] <- "conspecific"
 
