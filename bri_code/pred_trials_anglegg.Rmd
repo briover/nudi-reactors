@@ -12,11 +12,10 @@ knitr::opts_chunk$set(echo = TRUE)
 library(circular)
 library(ggplot2)
 library(dplyr)
-predraw <- read.csv("raw_data/rawpred.csv", sep = ",", header = TRUE)
 ```
 
 ```{r}
-
+predraw <- read.csv("./raw_data/Meyknecht_Over_Parker_MRNE475_2024_rawpred.csv")
 #Attempted to plot the movement angles of the nudis as circular data showing points
 #This was the attempt using the ggplot() package as but it did not  allow for similar
 #points to be stacked properly, however could change colour with treatment group

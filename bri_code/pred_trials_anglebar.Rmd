@@ -7,7 +7,6 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-setwd("C:/Users/brian/Documents/Bamfield Fall 2024/DS-ADA/DS/nudi-git")
 ```
 
 ```{r}
@@ -16,7 +15,7 @@ setwd("C:/Users/brian/Documents/Bamfield Fall 2024/DS-ADA/DS/nudi-git")
 library(circular)
 library(ggplot2)
 library(dplyr)
-predraw <- read.csv("raw_data/rawpred.csv", sep = ",", header = TRUE)
+predraw <- read.csv("raw_data/Meyknecht_Over_Parker_MRNE475_2024_rawpred.csv", sep = ",", header = TRUE)
 
 ```
 
@@ -68,7 +67,5 @@ ggplot(nudibranch_summary, aes(x = binned_fixdeg, fill = as.factor(temp))) +
 
 ```
 
-```{r}
 
-```
 

@@ -16,7 +16,7 @@ library(ggplot2)
 library(dplyr)
 
 # Load the dataset
-nudibranch_data <- read.csv("raw_data/rawpred.csv", sep = ",", header = TRUE)
+nudibranch_data <- read.csv("raw_data/Meyknecht_Over_Parker_MRNE475_2024_rawpred.csv", sep = ",", header = TRUE)
 
 # Calculate the average angle for each nudibranch (nudi_num) grouped by temperature
 nudibranch_summary <- nudibranch_data %>%
