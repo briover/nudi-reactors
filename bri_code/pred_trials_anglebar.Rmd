@@ -11,6 +11,8 @@ setwd("C:/Users/brian/Documents/Bamfield Fall 2024/DS-ADA/DS/nudi-git")
 ```
 
 ```{r}
+#load in necessary packages and data
+
 library(circular)
 library(ggplot2)
 library(dplyr)
@@ -19,6 +21,12 @@ predraw <- read.csv("raw_data/rawpred.csv", sep = ",", header = TRUE)
 ```
 
 ```{r}
+#Attempted to plot the movement angles of the nudis as circular data showing stacked bars
+
+#not useable in the context of the paper
+
+
+
 # Calculate the average angle for each nudibranch (nudi_num) grouped by temperature
 nudibranch_summary <- predraw %>%
   group_by(nudi_num, temp) %>%

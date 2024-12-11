@@ -10,7 +10,19 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-# Load necessary libraries
+
+#Attempted to plot the movement angles of the nudis as circular data showing points
+#This was the attempt using the circular() package as that allowed for similar
+#points to be stacked, but did not allow for colour to change with treatment group
+#so could not distinguish between groups
+
+#not useable in the context of the paper
+
+
+
+
+
+# Load necessary packages
 library(circular)
 library(dplyr)
 
