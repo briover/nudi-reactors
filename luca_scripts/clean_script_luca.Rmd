@@ -35,7 +35,7 @@ library(gamlss)
 
 ```{r}
 #load in data, change temperature to factor, remove extra space in "conspecific"
-nudi_data_factor <- read.csv("./clean_data/combinedraw.csv")%>%
+nudi_data_factor <- read.csv("./clean_data/Meyknecht_Over_Parker_MRNE475_2024_combinedraw.csv")%>%
   mutate(temp_grp = as.factor(temp_grp))
 nudi_data_factor$trial_type[nudi_data_factor$trial_type=="conspecific "] <- "conspecific"
 
@@ -70,7 +70,7 @@ summary(nudi_gamma_factor_times)
 coef_table <- as.data.frame(summary(nudi_gamma_factor_times)$coefficients$cond)
 
 # Save the table as a CSV file
-write.csv(coef_table, "nudi_gamma_factor_times_coefficients.csv", row.names = TRUE)
+write.csv(coef_table, "./luca_scripts/Meyknecht_Over_Parker_MRNE475_2024_nudi_gamma_factor_times_coefficients.csv", row.names = TRUE)
 ```
 
 ```{r}
@@ -122,9 +122,9 @@ boxplot_jitter_nudi
 boxplot_nudi_goodtheme
 
 #save plots as picture
-ggsave(plot = boxplot_nudi, filename = here("luca_scripts","boxplot_nudi.pdf"), width = 6, height = 4)
-ggsave(plot = boxplot_jitter_nudi, filename = here("luca_scripts","boxplot_jitter_nudi.pdf"), width = 6, height = 4)
-ggsave(plot =boxplot_nudi_goodtheme, filename = here("luca_scripts", "goodboxplot.png"), bg = "white", width = 6, height = 4)
+ggsave(plot = boxplot_nudi, filename = here("luca_scripts","Meyknecht_Over_Parker_MRNE475_2024_boxplot_nudi.pdf"), width = 6, height = 4)
+ggsave(plot = boxplot_jitter_nudi, filename = here("luca_scripts","Meyknecht_Over_Parker_MRNE475_2024_boxplot_jitter_nudi.pdf"), width = 6, height = 4)
+ggsave(plot =boxplot_nudi_goodtheme, filename = here("luca_scripts", "Meyknecht_Over_Parker_MRNE475_2024_goodboxplot.png"), bg = "white", width = 6, height = 4)
 
 
 ```
@@ -187,7 +187,7 @@ boxplot_nudi <- ggplot(nudi_data_factor, aes(x = temp_grp, y = mean_vel, fill = 
 boxplot_nudi
 
 #save plot as picture
-ggsave(plot =boxplot_nudi, filename = here("luca_scripts", "perfectplot.png"), bg = "white", width = 6, height = 4)
+ggsave(plot =boxplot_nudi, filename = here("luca_scripts", "Meyknecht_Over_Parker_MRNE475_2024_perfectplot.png"), bg = "white", width = 6, height = 4)
 ```
 
 
@@ -211,7 +211,7 @@ nudi_vel_length <- ggplot(nudi_data_factor, aes(x= avg_length_m, y = mean_vel)) 
   geom_smooth(method = "glm", color = "darkgrey", fill = "lightgrey")
 
 #save as picture
-ggsave(plot = nudi_vel_length, filename = here("luca_scripts","lm_length_vel2.png"), width = 6, height = 4, bg="white")
+ggsave(plot = nudi_vel_length, filename = here("luca_scripts","Meyknecht_Over_Parker_MRNE475_2024_lm_length_vel2.png"), width = 6, height = 4, bg="white")
 
 nudi_vel_length
 ```
