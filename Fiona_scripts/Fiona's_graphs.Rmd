@@ -5,34 +5,14 @@ date: "2024-12-07"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+this is the code for our circular data graphs - we did not include this graph in our final paper
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 ```{r}
-library(here) #loading data
-library(ggplot2) #plotting data
-library(readxl) #importing excel files
-library(sf) #for spatial data
+#loading in all my packages
+library(here) 
+library(ggplot2) 
+library(readxl) 
+library(sf) 
 library(cowplot)
 library(rnaturalearth)
 library(ggspatial)
@@ -40,27 +20,31 @@ library(dplyr)
 library(tidyverse)
 library(circular)
 
+#loading in all my data 
+
 nudi_con <- read.csv("./raw_data/rawcons.csv")
 trial_data <- read.csv("./raw_data/rawtrialdata.csv")
 nudi_preds <- read.csv("./raw_data/rawpred.csv")
 ```
 
 ```{r}
-cleantrialcons <- trial_data %>%
-  filter(trial_type == "conspecific") %>%
-  select(nudi_id, treatment_group)
 
+# here i am making each set of data that will be used in the individual plots for the circle. 
+
+# i clean the data by filtering for each temperature group, and select the columns i want.
 
 clean_con12 <- nudi_con%>%
   filter(temp_grp == 12) %>%
   select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
   na.omit()
 
+#then i make another data set from this that creates the average of the fixdeg column so that we can use it in our graph. I repeat this for every temp group and trial type.
+
  avg12 <- clean_con12 %>%
    group_by(nudi_num) %>%
    summarise(mean_angle = mean(fixdeg, na.rm = TRUE))
  
- 
+
 clean_con14 <- nudi_con%>%
   filter(temp_grp == 14) %>%
   select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
@@ -136,10 +120,9 @@ avg16p <- clean_pred16 %>%
 ```{r}
 #four panel pred plot results - basic with large size 
 create_circular_plot <- function(data, color, title, base_radius = 4, point_alpha = 0.5, point_size = 5) {
-  # Create a data frame for the circular frame
   circle_data <- data.frame(
-    mean_angle = seq(0, 360, by = 1),  # Full circle
-    y = base_radius                    # Base radius of the circle
+    mean_angle = seq(0, 360, by = 1),  
+    y = base_radius                    
   )
 
   ggplot(data, aes(x = mean_angle, y = base_radius)) +
@@ -150,7 +133,6 @@ create_circular_plot <- function(data, color, title, base_radius = 4, point_alph
       breaks = c(0, 90, 180, 270),
       labels = c("0°", "90°", "180°", "270°")
     ) +
-    # Slightly reduce the upper limit to bring labels closer to the circle
     scale_y_continuous(limits = c(0, 4.1)) +
     labs(title = title, x = "Mean Angular Movement (°)", y = NULL) +
     theme_minimal() +
@@ -160,30 +142,26 @@ create_circular_plot <- function(data, color, title, base_radius = 4, point_alph
       axis.ticks.y = element_blank(),
       panel.grid = element_blank(),
       plot.margin = unit(c(1, 1, 1, 1), "cm"),
-      # Adjust margins of x-axis text to move labels inward
-      axis.text.x = element_text(margin = margin(-10, 0, 0, 0), size = 14),  # Increase axis text size
-      plot.title = element_text(size = 16, face = "bold"),                   # Increase title size
-      axis.title.x = element_text(size = 14)                                # Increase axis title size
+      axis.text.x = element_text(margin = margin(-10, 0, 0, 0), size = 14),  
+      plot.title = element_text(size = 16, face = "bold"),                   
+      axis.title.x = element_text(size = 14)                          
     )
 }
 
-# Create individual plots for each temperature group
-library(patchwork) # Make sure this is called
 
-# Create individual plots (should all be ggplot objects)
+library(patchwork) 
 plot_12 <- create_circular_plot(avg12p, "red", "12°C")
 plot_14 <- create_circular_plot(avg14p, "blue", "14°C")
 plot_16 <- create_circular_plot(avg16p, "green", "16°C")
 plot_18 <- create_circular_plot(avg18p, "orange", "18°C")
 
-# Combine them
+
 four_panel_plot <- (plot_12 | plot_14) / (plot_16 | plot_18)
 
-# Display
+
 four_panel_plot
 
 
-# Save the combined plot if desired
 ggsave("four_panel_plot_pred_results.png", plot = four_panel_plot, width = 12, height = 12, dpi = 300)
 
 ```
@@ -191,10 +169,9 @@ ggsave("four_panel_plot_pred_results.png", plot = four_panel_plot, width = 12, h
 ```{r}
 #cons basicwith large size yaaayyy gooodododoo yaayyy 
 create_circular_plot <- function(data, color, title, base_radius = 4, point_alpha = 0.5, point_size = 5) {
-  # Create a data frame for the circular frame
   circle_data <- data.frame(
-    mean_angle = seq(0, 360, by = 1),  # Full circle
-    y = base_radius                    # Base radius of the circle
+    mean_angle = seq(0, 360, by = 1), 
+    y = base_radius                   
   )
 
   ggplot(data, aes(x = mean_angle, y = base_radius)) +
@@ -205,7 +182,6 @@ create_circular_plot <- function(data, color, title, base_radius = 4, point_alph
       breaks = c(0, 90, 180, 270),
       labels = c("0°", "90°", "180°", "270°")
     ) +
-    # Slightly reduce the upper limit to bring labels closer to the circle
     scale_y_continuous(limits = c(0, 4.1)) +
     labs(title = title, x = "Mean Angular Movement (°)", y = NULL) +
     theme_minimal() +
@@ -215,30 +191,26 @@ create_circular_plot <- function(data, color, title, base_radius = 4, point_alph
       axis.ticks.y = element_blank(),
       panel.grid = element_blank(),
       plot.margin = unit(c(1, 1, 1, 1), "cm"),
-      # Adjust margins of x-axis text to move labels inward
-      axis.text.x = element_text(margin = margin(-10, 0, 0, 0), size = 14),  # Increase axis text size
-      plot.title = element_text(size = 16, face = "bold"),                   # Increase title size
-      axis.title.x = element_text(size = 14)                                # Increase axis title size
+      axis.text.x = element_text(margin = margin(-10, 0, 0, 0), size = 14),  
+      plot.title = element_text(size = 16, face = "bold"),                   
+      axis.title.x = element_text(size = 14)                              
     )
 }
 
-# Create individual plots for each temperature group
-library(patchwork) # Make sure this is called
+library(patchwork) 
 
-# Create individual plots (should all be ggplot objects)
 plot_12 <- create_circular_plot(avg12, "red", "12°C")
 plot_14 <- create_circular_plot(avg14, "blue", "14°C")
 plot_16 <- create_circular_plot(avg16, "green", "16°C")
 plot_18 <- create_circular_plot(avg18, "orange", "18°C")
 
-# Combine them
+
 four_panel_plot_c <- (plot_12 | plot_14) / (plot_16 | plot_18)
 
-# Display
+
 four_panel_plot_c
 
 
-# Save the combined plot if desired
 ggsave("four_panel_plot_cons_results.png", plot = four_panel_plot_c, width = 12, height = 12, dpi = 300)
 
 ```
@@ -246,10 +218,9 @@ ggsave("four_panel_plot_cons_results.png", plot = four_panel_plot_c, width = 12,
 ```{r}
 #possibly smaller con
 create_circular_plot <- function(data, color, title, base_radius = 4, point_alpha = 0.5, point_size = 1.5, line_size = 0.3) {
-  # Create a data frame for the circular frame
   circle_data <- data.frame(
-    mean_angle = seq(0, 360, by = 1),  # Full circle
-    y = base_radius                    # Base radius of the circle
+    mean_angle = seq(0, 360, by = 1),  
+    y = base_radius                    
   )
   
   ggplot(data, aes(x = mean_angle, y = base_radius)) +
@@ -268,11 +239,10 @@ create_circular_plot <- function(data, color, title, base_radius = 4, point_alph
       axis.text.y = element_blank(),
       axis.ticks.y = element_blank(),
       panel.grid = element_blank(),
-      plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")  # Keep margins proportional
+      plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")  
     )
 }
 
-# Create individual plots
 library(patchwork)
 
 plot_12 <- create_circular_plot(avg12, "red", "12°C", point_size = 1.5, line_size = 0.3)
@@ -280,15 +250,13 @@ plot_14 <- create_circular_plot(avg14, "blue", "14°C", point_size = 1.5, line_s
 plot_16 <- create_circular_plot(avg16, "green", "16°C", point_size = 1.5, line_size = 0.3)
 plot_18 <- create_circular_plot(avg18, "orange", "18°C", point_size = 1.5, line_size = 0.3)
 
-# Combine the plots
 four_panel_plot_c <- (plot_12 | plot_14) / (plot_16 | plot_18)
 
-# Save the plot with adjusted size
 ggsave(
   "four_panel_plot_cons_resultssmall.png",
   plot = four_panel_plot_c,
-  width = 8.5 / 2,  # Half letter width (8.5 inches)
-  height = 5.5,     # Half letter height (5.5 inches)
+  width = 8.5 / 2,  
+  height = 5.5,     
   dpi = 300,
   units = "in"
 )
@@ -300,10 +268,9 @@ ggsave(
 ```{r}
 #possibly smaller pred
 create_circular_plot <- function(data, color, title, base_radius = 4, point_alpha = 0.5, point_size = 1.5, line_size = 0.3) {
-  # Create a data frame for the circular frame
   circle_data <- data.frame(
-    mean_angle = seq(0, 360, by = 1),  # Full circle
-    y = base_radius                    # Base radius of the circle
+    mean_angle = seq(0, 360, by = 1),  
+    y = base_radius                   
   )
   
   ggplot(data, aes(x = mean_angle, y = base_radius)) +
@@ -322,11 +289,10 @@ create_circular_plot <- function(data, color, title, base_radius = 4, point_alph
       axis.text.y = element_blank(),
       axis.ticks.y = element_blank(),
       panel.grid = element_blank(),
-      plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")  # Keep margins proportional
+      plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm") 
     )
 }
 
-# Create individual plots
 library(patchwork)
 
 plot_12 <- create_circular_plot(avg12p, "red", "12°C", point_size = 1.5, line_size = 0.3)
@@ -334,15 +300,13 @@ plot_14 <- create_circular_plot(avg14p, "blue", "14°C", point_size = 1.5, line_
 plot_16 <- create_circular_plot(avg16p, "green", "16°C", point_size = 1.5, line_size = 0.3)
 plot_18 <- create_circular_plot(avg18p, "orange", "18°C", point_size = 1.5, line_size = 0.3)
 
-# Combine the plots
 four_panel_plot_c <- (plot_12 | plot_14) / (plot_16 | plot_18)
 
-# Save the plot with adjusted size
 ggsave(
   "four_panel_plot_pred_resultssmall.png",
   plot = four_panel_plot_c,
-  width = 8.5 / 2,  # Half letter width (8.5 inches)
-  height = 5.5,     # Half letter height (5.5 inches)
+  width = 8.5 / 2,  
+  height = 5.5,     
   dpi = 300,
   units = "in"
 )
