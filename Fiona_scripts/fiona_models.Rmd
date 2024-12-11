@@ -9,27 +9,23 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+this rmd was mainlyused to create usable code for our models, we created mean values for velocity and nudi angular direction of movement and saved it into a combinedraw file in our clean data folder then edited this into a version without an error we found in the original data called combined_raw_no_spaces.
+
 ```{r}
 #loading in all my packages
-
+ 
 library(here) 
-library(ggplot2) 
-library(readxl) 
-library(sf) 
-library(cowplot)
-library(rnaturalearth)
-library(ggspatial)
 library(dplyr)
-library(tidyverse)
+library(tidyverse)  
 library(circular)
 
-#loading in all our data
+#loading in all our raw data
 
-rawcons <- read.csv("./raw_data/rawcons.csv")
+rawcons <- read.csv("./raw_data/Meyknecht_Over_Parker_MRNE475_2024_rawcons.csv")
 
-nudisize <- read.csv("./raw_data/nudisizeraw.csv")
+nudisize <- read.csv("./raw_data/Meyknecht_Over_Parker_MRNE475_2024_nudisizeraw.csv")
 
-rawpreds <- read.csv("./raw_data/rawpred.csv")%>%
+rawpreds <- read.csv("./raw_data/Meyknecht_Over_Parker_MRNE475_2024_rawpred.csv")%>%
   rename(temp_grp = temp)
 
 #cleaning up the data and getting means and standard deviations 
@@ -43,7 +39,7 @@ combinedraw <- rbind(rawcons, rawpreds) %>%
     mean_vel = mean(v_ms, na.rm = TRUE),
     sd_vel = sd(v_ms, na.rm = TRUE)      
   ) %>%
-  left_join(y = nudisize, by = "nudi_num") %>% #adding in nudi number to help identify each line of code 
+  left_join(y = nudisize, by = "nudi_num") %>% #adding in nudisize to help create a usuable tablefor our data connecting by nudi_num
   mutate(direction_binom = case_when(
     mean_angle >= 0 & mean_angle <= 180 ~ 0,
     mean_angle <= 360 & mean_angle > 180 ~ 1
@@ -53,15 +49,15 @@ combinedraw <- rbind(rawcons, rawpreds) %>%
 ```
 ```{r}
 # our data had a row with a space so we used this code to fix it
-nudi_data_nospaces <- read.csv("clean_data/combinedraw.csv")%>%
+nudi_data_nospaces <- read.csv("clean_data/Meyknecht_Over_Parker_MRNE475_2024_combinedraw.csv")%>%
   mutate(temp_grp = as.factor(temp_grp))
 nudi_data_nospaces$trial_type[nudi_data_nospaces$trial_type=="conspecific "] <- "conspecific"
 
 nudi_data_nospaces_xl <- nudi_data_nospaces %>%
-  select(nudi_num, trial_type, mean_vel, sd_vel)%>%
+  dplyr::select(nudi_num, trial_type, mean_vel, sd_vel)%>%
   filter(trial_type == "conspecific")
 
-write.csv(nudi_data_nospaces_xl, "./clean_data/nudivelcorrected.csv")
+write.csv(nudi_data_nospaces_xl, "./clean_data/Meyknecht_Over_Parker_MRNE475_2024_combinedraw_no_spaces.csv")
 ```
 
 

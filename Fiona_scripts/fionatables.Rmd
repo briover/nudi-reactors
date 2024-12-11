@@ -20,11 +20,11 @@ library(readxl)
 
 ```
 
-This RMD contains all the code for making the tables in our paper
+This RMD contains all the code for making the tables in our paper- the binomial model the velocity model and the averagemean velocity with SEM table 
 
 ```{r}
 #This chunk loads in all the data and cleans it
-meanvel_data_raw <- read.csv("./tables/mean_vel.csv", stringsAsFactors = FALSE)
+meanvel_data_raw <- read.csv("./tables/Meyknecht_Over_Parker_MRNE475_2024_mean_vel.csv", stringsAsFactors = FALSE)
 
 #mean_vel is in meters per second and we want to display this in cm per second so we mutate it here
 meanvel_data_clean <- meanvel_data_raw %>%
@@ -34,14 +34,11 @@ meanvel_data_clean <- meanvel_data_raw %>%
   )%>%
    dplyr::select(-mean, -se)
 
-
-binomial_table_data <- read.csv("./tables/binom_table.csv", stringsAsFactors = FALSE)
-
 #loading in these files as an excel file so that the degree symbol translates over to R
 
-velocitymodel <- read_excel("./tables/excel_velocity.xlsx")
+velocitymodel <- read_excel("./tables/Meyknecht_Over_Parker_MRNE475_2024_excel_velocity.xlsx")
 
-binommodel <- read_excel("./tables/binom_excel.xlsx") 
+binommodel <- read_excel("./tables/Meyknecht_Over_Parker_MRNE475_2024_binom_excel.xlsx") 
 ```
 
 
@@ -52,8 +49,8 @@ vel_table <- meanvel_data_clean %>%  #picking the data set and naming the table
 
   cols_label(  #this setting up the labels for the table 
     temp_grp = "Trial Group (°C)",  
-    mean_cms = "Mean Velocity (cm/s)",          
-    se_cms = "Standard Error (cm/s)"            
+    mean_cms = "Average Mean Velocity (cm/s)",          
+    se_cms = "SE (cm/s)"            
   ) %>%
  
   tab_style( #table style specifications 
@@ -68,7 +65,7 @@ vel_table <- meanvel_data_clean %>%  #picking the data set and naming the table
 
 vel_table
 
-gtsave(vel_table, "./tables/mean_vel_tale.png") #saving table
+gtsave(vel_table, "./tables/Meyknecht_Over_Parker_MRNE475_2024_avgmean_vel_table.png") #saving table
 
 ```
 
@@ -101,7 +98,7 @@ velocitym_table <- velocitymodel %>%
   cols_width(interaction_of ~ px(400))
 velocitym_table
 
-gtsave(velocitym_table, "./tables/velocity_m_table.png")
+gtsave(velocitym_table, "./tables/Meyknecht_Over_Parker_MRNE475_2024_velocity_model_table.png")
 
 ```
 
@@ -133,7 +130,7 @@ model2binom_table <- binommodel %>%
 
 model2binom_table
 
-gtsave(model2binom_table, "./tables/model_binom_table.png")
+gtsave(model2binom_table, "./tables/Meyknecht_Over_Parker_MRNE475_2024_model_binom_table.png")
 
 ```
 
