@@ -1,0 +1,136 @@
+---
+title: "Binomial Model: Graphs and Stats"
+author: "Bri Over"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#load neccesary packages
+
+knitr::opts_chunk$set(echo = TRUE)
+
+library(here)
+library(glmmTMB)
+library(tidyverse)
+library(DHARMa)
+library(ggeffects)
+library(performance)
+library(car)
+library(mgcv)
+library(fitdistrplus)
+library(goft)
+library(gamlss)
+```
+
+
+```{r}
+
+# Load the dataset and alter to be used in making the model
+nudi_data <- read.csv("clean_data/combinedraw.csv")%>%
+  mutate(temp_grp = as.factor(temp_grp)) #change how the data is structured so that treatment group is considered a factor
+nudi_data$trial_type[nudi_data$trial_type=="conspecific "] <- "conspecific" #ensure all cue types are listed the same way
+# View the structure of the updated dataset to confirm changes:
+str(nudi_data)
+
+```
+ 
+```{r}
+#create the binomial model, looking at treatment group, body length and cue type as factors
+#along with the interaction between treatment group and body length
+glm_binom2 <- glmmTMB(direction_binom ~ temp_grp * avg_length_m + trial_type, family = binomial(link = "logit"), data = nudi_data)
+simulateResiduals(glm_binom2)%>% 
+  plot() #plot residuals to visually determine fit of model, if no red text or lines data fits the binomial distribution
+
+#Residuals show that the binomial model fits the data
+
+# Extract the coefficients directly from the model summary
+binom_table <- as.data.frame(summary(glm_binom2)$coefficients$cond)
+
+summary(glm_binom2) #check data before exporting
+
+# Save the table as a CSV file
+write.csv(binom_table, "bri_code/binom_table.csv", row.names = TRUE)
+
+```
+ 
+```{r}
+# Summarize the data: Count nudibranchs that moved towards or away for each combination of trial_type, temp_grp, and direction_binom
+nudi_data_summary <- nudi_data %>%
+  group_by(trial_type, temp_grp, direction_binom) %>%
+  summarise(count = n(), .groups = 'drop')
+
+# Calculate total number of nudibranchs in each trial_type and temp_grp
+nudi_data_totals <- nudi_data %>%
+  group_by(trial_type, temp_grp) %>%
+  summarise(total = n(), .groups = 'drop')
+
+# Join the summarized data with the total counts to calculate proportions
+nudi_data_prop <- nudi_data_summary %>%
+  left_join(nudi_data_totals, by = c("trial_type", "temp_grp")) %>%
+  mutate(proportion = count / total)  # Calculate proportion for each direction
+
+# Ensure 'direction_binom' is a factor with appropriate levels
+nudi_data_prop$direction_binom <- factor(nudi_data_prop$direction_binom, levels = c(0, 1))
+
+# Handle missing data for "towards" direction in case there are no nudibranchs for that direction
+nudi_data_prop_complete <- nudi_data_prop %>%
+  complete(trial_type, temp_grp, direction_binom, fill = list(count = 0))  # Ensures missing rows are added
+
+# Set any NA values in proportion to 0 (this handles cases where count is 0 or missing)
+nudi_data_prop_complete$proportion[is.na(nudi_data_prop_complete$proportion)] <- 0
+
+# Get the maximum proportion to set the y-axis limit
+y_max <- max(nudi_data_prop_complete$proportion, na.rm = TRUE)
+
+# Create the bar chart with the correct facet to have both conspecific and predator cues, with the same y-axis for both cue types
+plot_rxn_probs <- ggplot(nudi_data_prop_complete, aes(x = factor(temp_grp), y = proportion, fill = factor(direction_binom))) +
+  geom_bar(stat = "identity", position = "dodge") +  # dodge bars so they do not overlap
+  facet_wrap(~ trial_type, scales = "free_y",  
+             labeller = labeller(trial_type = c("conspecific" = "Conspecific Cues", "predator" = "Predator Cues"))) +  # Rename facet labels
+  labs(
+    title = "", #Set axes and legend title and remove graph title
+    x = "Treatment Group (°C)",
+    y = "Proportion of Nudibranchs",
+    fill = "Direction"
+  ) +
+  scale_fill_manual(values = c("0" = "lightblue", "1" = "navyblue"), labels = c("Away", "Towards")) + 
+  scale_y_continuous(limits = c(0, y_max), expand = c(0, 0)) +  #Proportion bars touch the x-axis
+  scale_x_discrete(expand = c(0.2, 0)) +  # Increase space between the treatment groups on the x-axis
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(vjust = 1),  # Adjust vertical alignment of y-axis text
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(), 
+    axis.line = element_line(color = "black", linewidth = 0.5), 
+    axis.ticks = element_line(color = "black", linewidth = 0.5),  
+    axis.title.x = element_text(margin = margin(t = 10)),  # Add space between x-axis labels and numbers
+    axis.title.y = element_text(margin = margin(r = 10)),  # Add space between y-axis labels and numbers
+    strip.text = element_text(size = 12, face = "bold", margin = margin(b = 20))  # Add space between facet labels and graph
+  )
+
+plot_rxn_probs
+
+```
+ 
+```{r}
+#optional look at summary table for proportion values of bar chart, may save and include
+#double check that each treatment group is represented properly
+
+summary_table <- nudi_data_prop_complete %>%
+  dplyr::select(trial_type, temp_grp, direction_binom, proportion) %>%
+  arrange(trial_type, temp_grp, direction_binom)
+
+print(summary_table)
+
+
+```
+ 
+```{r}
+#save plot to git folder
+
+ggsave(plot = plot_rxn_probs, filename = here("bri_code", "plot_rxn_probs.png"), bg = "white", width = 6, height = 4)
+
+```
+ 
+ 

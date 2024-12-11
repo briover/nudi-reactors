@@ -10,16 +10,21 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-library(here) #loading data
-library(ggplot2) #plotting data
-library(readxl) #importing excel files
-library(sf) #for spatial data
+#loading in all my packages
+
+library(here) 
+library(ggplot2) 
+library(readxl) 
+library(sf) 
 library(cowplot)
 library(rnaturalearth)
 library(ggspatial)
 library(dplyr)
 library(tidyverse)
 library(circular)
+
+#loading in all our data
+
 rawcons <- read.csv("./raw_data/rawcons.csv")
 
 nudisize <- read.csv("./raw_data/nudisizeraw.csv")
@@ -27,35 +32,36 @@ nudisize <- read.csv("./raw_data/nudisizeraw.csv")
 rawpreds <- read.csv("./raw_data/rawpred.csv")%>%
   rename(temp_grp = temp)
 
+#cleaning up the data and getting means and standard deviations 
+
 combinedraw <- rbind(rawcons, rawpreds) %>%
   mutate(temp_grp = as.factor(temp_grp)) %>%
   group_by(nudi_num, temp_grp, trial_type) %>%
   summarise(
     mean_angle = mean(fixdeg, na.rm = TRUE),
-    sd_angle = sd(fixdeg, na.rm = TRUE), # Calculate standard deviation for mean_angle
+    sd_angle = sd(fixdeg, na.rm = TRUE),
     mean_vel = mean(v_ms, na.rm = TRUE),
-    sd_vel = sd(v_ms, na.rm = TRUE)      # Calculate standard deviation for mean_vel
+    sd_vel = sd(v_ms, na.rm = TRUE)      
   ) %>%
-  left_join(y = nudisize, by = "nudi_num") %>%
+  left_join(y = nudisize, by = "nudi_num") %>% #adding in nudi number to help identify each line of code 
   mutate(direction_binom = case_when(
     mean_angle >= 0 & mean_angle <= 180 ~ 0,
     mean_angle <= 360 & mean_angle > 180 ~ 1
   ))
 
-nudi_data_nospaces <- read.csv("clean_data/combinedraw.csv")%>%
-  mutate(temp_grp = as.factor(temp_grp))
-nudi_data_nospaces$trial_type[nudi_data$trial_type=="conspecific "] <- "conspecific"
-
 
 ```
 ```{r}
+# our data had a row with a space so we used this code to fix it
 nudi_data_nospaces <- read.csv("clean_data/combinedraw.csv")%>%
   mutate(temp_grp = as.factor(temp_grp))
 nudi_data_nospaces$trial_type[nudi_data_nospaces$trial_type=="conspecific "] <- "conspecific"
 
 nudi_data_nospaces_xl <- nudi_data_nospaces %>%
-  select(nudi_num, trial_type, mean_vel, sd_vel)
+  select(nudi_num, trial_type, mean_vel, sd_vel)%>%
+  filter(trial_type == "conspecific")
 
 write.csv(nudi_data_nospaces_xl, "./clean_data/nudivelcorrected.csv")
 ```
+
 
