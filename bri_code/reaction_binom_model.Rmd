@@ -32,7 +32,7 @@ library(gamlss)
 #this was a test run, tried modelling different variables to analyze the response
 #compared to the expected outcome but did not end up using
 
-nudi_data <- read.csv("clean_data/combinedraw.csv")%>%
+nudi_data <- read.csv("clean_data/Meyknecht_Over_Parker_MRNE475_2024_combinedraw.csv")%>%
   mutate(temp_grp = as.factor(temp_grp))
 nudi_data$trial_type[nudi_data$trial_type=="conspecific "] <- "conspecific"
 # Read in the original dataset
@@ -67,7 +67,7 @@ binom_table <- as.data.frame(summary(glm_binom2)$coefficients$cond)
 summary(glm_binom2)
 
 # Save the table as a CSV file
-write.csv(binom_table, "bri_code/binom_table.csv", row.names = TRUE)
+write.csv(binom_table, "bri_code/Meyknecht_Over_Parker_MRNE475_2024_binom_table.csv", row.names = TRUE)
 
 
 ```
@@ -151,7 +151,7 @@ print(summary_table)
 
 
 ```{r}
-ggsave(plot = plot_rxn_probs, filename = here("bri_code", "plot_rxn_probs.png"), bg = "white", width = 6, height = 4)
+ggsave(plot = plot_rxn_probs, filename = here("bri_code", "Meyknecht_Over_Parker_MRNE475_2024_plot_rxn_probs.png"), bg = "white", width = 6, height = 4)
 
 ```
 
