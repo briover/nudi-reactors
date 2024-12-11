@@ -22,23 +22,20 @@ library(circular)
 
 #loading in all my data 
 
-nudi_con <- read.csv("./raw_data/rawcons.csv")
-trial_data <- read.csv("./raw_data/rawtrialdata.csv")
-nudi_preds <- read.csv("./raw_data/rawpred.csv")
+nudi_con <- read.csv("./raw_data/Meyknecht_Over_Parker_MRNE475_2024_rawcons.csv")
+trial_data <- read.csv("./raw_data/Meyknecht_Over_Parker_MRNE475_2024_rawtrialdata.csv")
+nudi_preds <- read.csv("./raw_data/Meyknecht_Over_Parker_MRNE475_2024_rawpred.csv")
 ```
 
 ```{r}
 
-# here i am making each set of data that will be used in the individual plots for the circle. 
-
-# i clean the data by filtering for each temperature group, and select the columns i want.
+# here i am making each graph that we will be makings its own little data set -> this data set will then be complied into 2 groups of 4 to give us two four paneled graphs that demonstrate the mean angular direction of each nudibranch in each treatment group
 
 clean_con12 <- nudi_con%>%
   filter(temp_grp == 12) %>%
-  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  dplyr::select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
   na.omit()
 
-#then i make another data set from this that creates the average of the fixdeg column so that we can use it in our graph. I repeat this for every temp group and trial type.
 
  avg12 <- clean_con12 %>%
    group_by(nudi_num) %>%
@@ -47,7 +44,7 @@ clean_con12 <- nudi_con%>%
 
 clean_con14 <- nudi_con%>%
   filter(temp_grp == 14) %>%
-  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  dplyr::select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
   na.omit()
 
  avg14 <- clean_con14 %>%
@@ -57,7 +54,7 @@ clean_con14 <- nudi_con%>%
  
  clean_con16 <- nudi_con%>%
   filter(temp_grp == 16) %>%
-  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  dplyr::select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
   na.omit()
 
 avg16 <- clean_con16 %>%
@@ -67,7 +64,7 @@ avg16 <- clean_con16 %>%
  
  clean_con18 <- nudi_con%>%
   filter(temp_grp == 18) %>%
-  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  dplyr::select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
   na.omit()
 
  avg18 <- clean_con18 %>%
@@ -79,7 +76,7 @@ avg16 <- clean_con16 %>%
 
 clean_pred12 <- nudi_pred%>%
   filter(temp_grp == 12) %>%
-  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  dplyr::select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
   na.omit()
 
  avg12p <- clean_pred12 %>%
@@ -89,7 +86,7 @@ clean_pred12 <- nudi_pred%>%
  
 clean_pred14 <- nudi_pred%>%
   filter(temp_grp == 14) %>%
-  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  dplyr::select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
   na.omit()
 
  avg14p <- clean_pred14 %>%
@@ -99,7 +96,7 @@ clean_pred14 <- nudi_pred%>%
  
  clean_pred16 <- nudi_pred%>%
   filter(temp_grp == 16) %>%
-  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  dplyr::select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
   na.omit()
 
 avg16p <- clean_pred16 %>%
@@ -109,7 +106,7 @@ avg16p <- clean_pred16 %>%
  
  clean_pred18 <- nudi_pred%>%
   filter(temp_grp == 18) %>%
-  select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
+  dplyr::select(nudi_num, temp_grp, fixdeg, rawdeg) %>%
   na.omit()
 
  avg18p <- clean_pred18 %>%
@@ -119,6 +116,8 @@ avg16p <- clean_pred16 %>%
 
 ```{r}
 #four panel pred plot results - basic with large size 
+
+#this is the graph for the four paneled predator plot, i set the graph to be circular data opposed to x and y axis and then using ggplot made the specifications of the graph. then using patchwork i created all four plots using the same specifications from the circle plot and i put them all together in one graph. this was saved to plots_circle. 
 create_circular_plot <- function(data, color, title, base_radius = 4, point_alpha = 0.5, point_size = 5) {
   circle_data <- data.frame(
     mean_angle = seq(0, 360, by = 1),  
@@ -162,12 +161,15 @@ four_panel_plot <- (plot_12 | plot_14) / (plot_16 | plot_18)
 four_panel_plot
 
 
-ggsave("four_panel_plot_pred_results.png", plot = four_panel_plot, width = 12, height = 12, dpi = 300)
+ggsave("./plots_circle/Meyknecht_Over_Parker_MRNE475_2024_four_panel_plot_pred_results.png", plot = four_panel_plot, width = 12, height = 12, dpi = 300)
 
 ```
 
 ```{r}
-#cons basicwith large size yaaayyy gooodododoo yaayyy 
+#cons four paneled graph 
+
+#this was made the same way as the predator 4 panel except with the cons data
+
 create_circular_plot <- function(data, color, title, base_radius = 4, point_alpha = 0.5, point_size = 5) {
   circle_data <- data.frame(
     mean_angle = seq(0, 360, by = 1), 
@@ -211,12 +213,12 @@ four_panel_plot_c <- (plot_12 | plot_14) / (plot_16 | plot_18)
 four_panel_plot_c
 
 
-ggsave("four_panel_plot_cons_results.png", plot = four_panel_plot_c, width = 12, height = 12, dpi = 300)
+ggsave("./plots_circle/Meyknecht_Over_Parker_MRNE475_2024_four_panel_plot_cons_results.png", plot = four_panel_plot_c, width = 12, height = 12, dpi = 300)
 
 ```
 
 ```{r}
-#possibly smaller con
+#this is the same but i shrink down the panels 
 create_circular_plot <- function(data, color, title, base_radius = 4, point_alpha = 0.5, point_size = 1.5, line_size = 0.3) {
   circle_data <- data.frame(
     mean_angle = seq(0, 360, by = 1),  
@@ -253,7 +255,7 @@ plot_18 <- create_circular_plot(avg18, "orange", "18°C", point_size = 1.5, line
 four_panel_plot_c <- (plot_12 | plot_14) / (plot_16 | plot_18)
 
 ggsave(
-  "four_panel_plot_cons_resultssmall.png",
+  "./plots_circle/Meyknecht_Over_Parker_MRNE475_2024_four_panel_plot_cons_resultssmall.png",
   plot = four_panel_plot_c,
   width = 8.5 / 2,  
   height = 5.5,     
@@ -266,7 +268,7 @@ ggsave(
 
 
 ```{r}
-#possibly smaller pred
+#smaller pred
 create_circular_plot <- function(data, color, title, base_radius = 4, point_alpha = 0.5, point_size = 1.5, line_size = 0.3) {
   circle_data <- data.frame(
     mean_angle = seq(0, 360, by = 1),  
@@ -303,7 +305,7 @@ plot_18 <- create_circular_plot(avg18p, "orange", "18°C", point_size = 1.5, lin
 four_panel_plot_c <- (plot_12 | plot_14) / (plot_16 | plot_18)
 
 ggsave(
-  "four_panel_plot_pred_resultssmall.png",
+  "./plots_circle/Meyknecht_Over_Parker_MRNE475_2024_four_panel_plot_pred_resultssmall.png",
   plot = four_panel_plot_c,
   width = 8.5 / 2,  
   height = 5.5,     
