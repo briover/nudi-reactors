@@ -117,12 +117,11 @@ plot_rxn_probs <- ggplot(nudi_data_prop_complete, aes(x = factor(temp_grp), y = 
   scale_x_discrete(expand = c(0.2, 0)) +  # Increase space between the categories on the x-axis
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),  # Rotate x-axis labels for readability
     axis.text.y = element_text(vjust = 1),  # Adjust vertical alignment of y-axis text
     panel.grid.major = element_blank(),  # Remove major gridlines
     panel.grid.minor = element_blank(),  # Remove minor gridlines
-    axis.line = element_line(color = "black", size = 0.5),  # Add axis lines for both x and y axes
-    axis.ticks = element_line(color = "black", size = 0.5),  # Add ticks to both x and y axes
+    axis.line = element_line(color = "black", linewidth = 0.5),  # Add axis lines for both x and y axes
+    axis.ticks = element_line(color = "black", linewidth = 0.5),  # Add ticks to both x and y axes
     axis.title.x = element_text(margin = margin(t = 10)),  # Add space between x-axis labels and numbers
     axis.title.y = element_text(margin = margin(r = 10)),  # Add space between y-axis labels and numbers
     strip.text = element_text(size = 12, face = "bold", margin = margin(b = 20))  # Add space between facet labels and graph
@@ -131,12 +130,20 @@ plot_rxn_probs <- ggplot(nudi_data_prop_complete, aes(x = factor(temp_grp), y = 
 plot_rxn_probs
 
 ```
+```{r}
+summary_table <- nudi_data_prop_complete %>%
+  dplyr::select(trial_type, temp_grp, direction_binom, proportion) %>%
+  arrange(trial_type, temp_grp, direction_binom)
 
+print(summary_table)
+
+
+```
 
 
 
 ```{r}
-ggsave(plot = plot_rxn_probs, filename = here("bri_code", "plot_rxn_probs.png"), bg = "white")
+ggsave(plot = plot_rxn_probs, filename = here("bri_code", "plot_rxn_probs.png"), bg = "white", width = 6, height = 4)
 
 ```
 
