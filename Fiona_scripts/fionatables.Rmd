@@ -41,7 +41,7 @@ binomial_table_data <- read.csv("./tables/binom_table.csv", stringsAsFactors = F
 
 velocitymodel <- read_excel("./tables/excel_velocity.xlsx")
 
-lucabinom <- read_excel("./tables/binom_excel.xlsx")
+binommodel <- read_excel("./tables/binom_excel.xlsx") 
 ```
 
 
@@ -81,7 +81,7 @@ gtsave(vel_table, "./tables/mean_vel_tale.png") #saving table
 velocitym_table <- velocitymodel %>%
   gt() %>%
   cols_label(
-    interaction_of = "Factors",  
+    interaction_of = "Factor",  
     estimate_se = "Estimate +/-SE",          
     z_value = "Z Value",
     pr = "Pr(>|z|)",
@@ -109,10 +109,10 @@ gtsave(velocitym_table, "./tables/velocity_m_table.png")
 #the binomial table data 
 #this is also the same code with different labels and data
 
-model2binom_table <- lucabinom %>%
+model2binom_table <- binommodel %>%
   gt() %>%
   cols_label(
-    interaction = "Factors",  
+    interaction = "Factor",  
     estimate = "Estimate +/-SE",          
     z_value = "Z Value",
     pr = "Pr(>|z|)",
@@ -130,14 +130,10 @@ model2binom_table <- lucabinom %>%
   ) %>%
   
   cols_width(interaction ~ px(400))
-velocitym_table
- 
-
-velocitym_table
 
 model2binom_table
 
-gtsave(velocitym_table, "./tables/model2binom_table.png")
+gtsave(model2binom_table, "./tables/model_binom_table.png")
 
 ```
 
