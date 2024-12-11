@@ -82,11 +82,10 @@ my_cols <- c("12" = "red", "14" = "darkblue","16" = "green", "18"= "yellow" )
 #boxplot mean velocity for different temperature groups without jitter
 boxplot_nudi <- ggplot(nudi_data_factor, aes(x=temp_grp, y=mean_vel, fill=temp_grp)) + 
     geom_boxplot(alpha=0.3) +
-  scale_color_manual(values = my_cols) +
   scale_fill_manual(values = my_cols) +
-  labs(y = "Mean velocity (m/s)\n", x = "\nTemperature(°C)", 
+  labs(y = "Mean velocity (m/s)\n", x = "\nTemperature (°C)", 
        color = "Treatment group (°C)", 
-       fill = "Treatment group(°C)") +
+       fill = "Treatment group (°C)") +
   theme_classic()
 
 #with jitter
@@ -95,17 +94,38 @@ boxplot_jitter_nudi <- ggplot(nudi_data_factor, aes(x=temp_grp, y=mean_vel, fill
     geom_boxplot(alpha=0.3) +
   scale_color_manual(values = my_cols) +
   scale_fill_manual(values = my_cols) +
-  labs(y = "Mean velocity (m/s)\n", x = "\nTemperature(°C)", 
+  labs(y = "Mean velocity (m/s)\n", x = "\nTemperature (°C)", 
        color = "Treatment group(°C)", 
        fill = "Treatment group(°C)") +
   theme_classic()
 
+#boxplot different theme
+boxplot_nudi_goodtheme <- ggplot(nudi_data_factor, aes(x=temp_grp, y=mean_vel, fill=temp_grp)) + 
+    geom_boxplot(alpha=0.3) +
+  scale_fill_manual(values = my_cols) +
+  labs(y = "Mean velocity (m/s)\n", x = "\nTemperature (°C)", 
+       color = "Treatment group (°C)", 
+       fill = "Treatment group (°C)") +
+theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),  # Remove major gridlines
+    panel.grid.minor = element_blank(),  # Remove minor gridlines
+    axis.line = element_line(color = "black", size = 0.5),  # Add axis lines for both x and y axes
+    axis.ticks = element_line(color = "black", size = 0.5),  # Add ticks to both x and y axes
+    axis.title.x = element_text(margin = margin(t = 10)),  # Add space between x-axis labels and numbers
+    axis.title.y = element_text(margin = margin(r = 10)),  # Add space between y-axis labels and numbers
+    strip.text = element_text(size = 12, face = "bold", margin = margin(b = 20))  # Add space between facet labels and graph
+  )
+
 boxplot_nudi
 boxplot_jitter_nudi
+boxplot_nudi_goodtheme
 
 #save plots as pdf
 ggsave(plot = boxplot_nudi, filename = here("luca_scripts","boxplot_nudi.pdf"), width = 6, height = 4)
 ggsave(plot = boxplot_jitter_nudi, filename = here("luca_scripts","boxplot_jitter_nudi.pdf"), width = 6, height = 4)
+
+ggsave(plot =boxplot_nudi_goodtheme, filename = here("luca_scripts", "goodboxplot.png"), bg = "white", width = 6, height = 4)
 
 
 ```
@@ -128,11 +148,18 @@ mean(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="18"])
 #all boxplot values + mean
 summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="12"])
 summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="14"])
-summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="16"]) 0.00141
-summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="18"]) 0.00146
+summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="16"]) 
+summary(nudi_data_factor$mean_vel[nudi_data_factor$temp_grp=="18"]) 
+
+nudi_data_factor %>%
+group_by(temp_grp) %>%
+summarize(mean = mean(mean_vel)*100,
+se = (sd(mean_vel)/sqrt(length(mean_vel)))*100)
+
+
 ```
 ```{r}
-#trying out boxplot with residuals of gamma model
+#trying out boxplot with residuals of gamma model REMOVE THIS
 
 model <- glmmTMB(mean_vel ~ avg_length_m, family = Gamma(link = "log"), data = nudi_data_factor)
 nudi_data_factor$residuals <- residuals(model, type = "response")
@@ -160,7 +187,7 @@ boxplot_nudi <- ggplot(nudi_data_factor, aes(x = temp_grp, y = mean_vel, fill = 
   scale_color_manual(values = my_cols) +
   scale_fill_manual(values = my_cols) +
   geom_point(data = mean_values, aes(x = temp_grp, y = mean_mean_vel), 
-             color = "black", size = 3, shape = 21, fill = "white") +
+             color = "black", size = 3, shape = 21, fill="black") +
   labs(
     y = "Mean velocity (m/s)\n", 
     x = "\nTemperature(°C)", 
@@ -183,5 +210,28 @@ model_variation <- lm(mean_vel ~ avg_length_m + temp_grp + trial_type + directio
 summary(model_variation)
 anova(model_variation)
 
+nudi_variation <- glmmTMB(mean_vel ~ avg_length_m, family = Gamma(link = "log"), data = nudi_data_factor)
+
+#fit simulated residuals in plot
+simulateResiduals(model_variation)%>%
+  plot()
+simulateResiduals(nudi_variation)%>%
+  plot()
+
+```
+```{r}
+#plot vel lenght
+nudi_vel_length <- ggplot(nudi_data_factor, aes(x= avg_length_m, y = mean_vel)) +
+  geom_point(size = 2) +
+  labs(
+    y = "Mean velocity (m/s)\n", 
+    x = "\nAverage length (m)") +
+  theme_classic() +
+  geom_smooth(method = "glm", color = "darkgrey", fill = "lightgrey")
+ggsave(plot = nudi_vel_length, filename = here("luca_scripts","lm_length_vel.pdf"), width = 6, height = 4)
+nudi_vel_length
+
+#fill = gray bars = st error around the line polygon: represent se of our line
+#colour is for points
 ```
 

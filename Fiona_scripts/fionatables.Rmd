@@ -1,0 +1,215 @@
+---
+-title: "exporting_tables_from_models"
+author: "Fiona Parker"
+date: "2024-12-10"
+output: html_document
+---
+
+
+```{r, include=FALSE}
+#loading in all necessary packages
+library(here) 
+library(ggplot2) 
+library(dplyr)
+library(knitr)
+library(DHARMa)
+library(gtable)
+library(gt)
+library(kableExtra)
+library(readxl)
+
+```
+
+This RMD contains all the code for making the tables in our paper
+
+```{r}
+#This chunk loads in all the data and cleans it
+meanvel_data_raw <- read.csv("./tables/mean_vel.csv", stringsAsFactors = FALSE)
+
+#mean_vel is in meters per second and we want to display this in cm per second so we mutate it here
+meanvel_data_clean <- meanvel_data_raw %>%
+  mutate(
+    mean_cms = mean * 100,
+    se_cms = se * 100
+  )%>%
+   dplyr::select(-mean, -se)
+
+
+binomial_table_data <- read.csv("./tables/binom_table.csv", stringsAsFactors = FALSE)
+
+#loading in these files as an excel file so that the degree symbol translates over to R
+
+velocitymodel <- read_excel("./tables/excel_velocity.xlsx")
+
+binommodel <- read_excel("./tables/binom_excel.xlsx") 
+```
+
+
+```{r}
+#this code is for creating the mean velocity table
+vel_table <- meanvel_data_clean %>%  #picking the data set and naming the table
+  gt() %>%
+
+  cols_label(  #this setting up the labels for the table 
+    temp_grp = "Trial Group (°C)",  
+    mean_cms = "Mean Velocity (cm/s)",          
+    se_cms = "Standard Error (cm/s)"            
+  ) %>%
+ 
+  tab_style( #table style specifications 
+    style = cell_text(align = "left"),
+    locations = cells_body()
+  ) %>%
+
+  tab_style( #table column specifications
+    style = cell_text(align = "left"),
+    locations = cells_column_labels()
+  )
+
+vel_table
+
+gtsave(vel_table, "./tables/mean_vel_tale.png") #saving table
+
+```
+
+
+```{r}
+# this is the table for the velocity model
+
+#The table follows the same code for the last one with different data set and labels
+
+velocitym_table <- velocitymodel %>%
+  gt() %>%
+  cols_label(
+    interaction_of = "Factor",  
+    estimate_se = "Estimate +/-SE",          
+    z_value = "Z Value",
+    pr = "Pr(>|z|)",
+    df = "Df"
+  ) %>%
+
+  tab_style(
+    style = cell_text(align = "left"),
+    locations = cells_body()
+  ) %>%
+
+  tab_style(
+    style = cell_text(align = "left"),
+    locations = cells_column_labels()
+  ) %>%
+  
+  cols_width(interaction_of ~ px(400))
+velocitym_table
+
+gtsave(velocitym_table, "./tables/velocity_m_table.png")
+
+```
+
+```{r}
+#the binomial table data 
+#this is also the same code with different labels and data
+
+model2binom_table <- binommodel %>%
+  gt() %>%
+  cols_label(
+    interaction = "Factor",  
+    estimate = "Estimate +/-SE",          
+    z_value = "Z Value",
+    pr = "Pr(>|z|)",
+    df = "Df"
+  ) %>%
+
+  tab_style(
+    style = cell_text(align = "left"),
+    locations = cells_body()
+  ) %>%
+
+  tab_style(
+    style = cell_text(align = "left"),
+    locations = cells_column_labels()
+  ) %>%
+  
+  cols_width(interaction ~ px(400))
+
+model2binom_table
+
+gtsave(model2binom_table, "./tables/model_binom_table.png")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
