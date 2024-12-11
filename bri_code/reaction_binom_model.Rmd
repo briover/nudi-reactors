@@ -11,8 +11,10 @@ only difference was in 18 compared to 12 (nudis at 18 moved slower)
 
 
 ```{r setup, include=FALSE}
+#load in necessary packages
+
 knitr::opts_chunk$set(echo = TRUE)
-setwd("C:/Users/brian/Documents/Bamfield Fall 2024/DS-ADA/DS/nudi-git")
+
 library(here)
 library(glmmTMB)
 library(tidyverse)
@@ -27,6 +29,9 @@ library(gamlss)
 ```
 
 ```{r}
+#this was a test run, tried modelling different variables to analyze the response
+#compared to the expected outcome but did not end up using
+
 nudi_data <- read.csv("clean_data/combinedraw.csv")%>%
   mutate(temp_grp = as.factor(temp_grp))
 nudi_data$trial_type[nudi_data$trial_type=="conspecific "] <- "conspecific"
@@ -45,6 +50,9 @@ str(nudi_data)
 
 
 ```{r}
+#trial runs for the model (a model graveyard) to determine what the best fit was
+#including models for the altered data looking at expected outcomes
+
 #glm_binom <- glmmTMB(move_as_expected ~ temp_grp * avg_length_m + trial_type, family = binomial(link = "logit"), data = nudi_data)
 #simulateResiduals(glm_binom)%>%
 #  plot()
@@ -196,7 +204,10 @@ ggplot(nudi_data_prop_overall, aes(x = factor(temp_grp), y = proportion, fill = 
 ```
 
 
-
+```{r}
+#more model graveyard below, tried calculating AIC but did not have to as the binomial
+#was clearly the correct fit
+```
 
 
 
@@ -265,5 +276,5 @@ simulateResiduals(glm_zib_int) %>%
 
 AIC(glm_bbinom_int, glm_binom_int, glm_zib_int)
 
-#interaction made this worse somehow: AIC for
+#interaction made this worse somehow
 
