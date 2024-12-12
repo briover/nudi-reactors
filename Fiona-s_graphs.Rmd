@@ -2,9 +2,7 @@
 title: "Graphs"
 author: "Fiona Parker"
 date: "2024-12-07"
-output:
-  pdf_document: default
-  html_document: default
+output: html_document
 ---
 
 this is the code for our circular data graphs - we did not include this graph in our final paper

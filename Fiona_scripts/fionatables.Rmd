@@ -1,8 +1,9 @@
 ---
--title: "exporting_tables_from_models"
+-title: exporting_tables_from_models
 author: "Fiona Parker"
 date: "2024-12-10"
-output: html_document
+output:
+  pdf_document: default
 ---
 
 

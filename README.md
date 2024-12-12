@@ -92,18 +92,18 @@ a binomial model that compares nudibranch movement based on the chemical cue to 
   *boxplot_jitter_nudi.pdf* - not used, boxplot with jitter, saved as pdf
     
   *clean_script_luca.rmd* this contains a clean and well annotated code for 
-    the entire velocity model and all its graphs.
+    the entire velocity model and all its graphs.inlcudes knit pdf
 
-## Fiona_scripts 
+## Fiona_scripts - 
     
   *fionatables.Rmd* - here you will find the code for all the tables used in 
-    the paper.
+    the paper. incliudes knit pdf
     
   *Fiona's_graphs.Rmd* - here you will find all the code for the angular 
-    direction plots. 
+    direction plots.
    
   *fiona_models.Rmd* - here you will find all the code for creating 
-    "combinedraw" a data set used in the models.
+    "combinedraw" a data set used in the models. includes knit pdf
 
 ## clean_data - here you will find all the data we cleaned in R Studio 
     
@@ -122,15 +122,17 @@ a binomial model that compares nudibranch movement based on the chemical cue to 
    
    *binom_table.xlsx* - sane table but excel format, used to make the table seen in the paper
   
-   *nudireactors_bmodel_wgraphs.Rmd* - contains the clean code forthe binomial model and all the graphs
+   *nudireactors_bmodel_wgraphs.Rmd* - contains the clean code forthe binomial model and all the graphs, includes a knit pdf
   
-   *reaction_binom_model.Rmd* - contains the process of getting the binomial model, not a clean code
+   *reaction_binom_model.Rmd* - contains the process of getting the binomial model, not a clean code,includes a knit pdf
   
   all the following are part of the process for getting the mean angular direction graphs
    *pred_trials_individualanglecirc.Rmd*
    *pred_trials_anglegg.Rmd*
    *pred_trials_anglebar.Rmd*
    *pred_trials_anglecirc.Rmd*
+   
+   ## metadata - all the metadata is included in this folder 
 
 
 
