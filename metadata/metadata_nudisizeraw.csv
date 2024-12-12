@@ -1,0 +1,14 @@
+data file name: Meyknecht_Over_Parker_MRNE475_2024_nudisizeraw.csv,,,,
+date: December 6th 2024,,,,
+Study: Temperature-Induced Shifts in Chemosensory Responses of Hermissenda crassicornis to Predator and Conspecific Cues,,,,
+"Course: BMSC Fall Program 2024, Directed Studies (MRSC 507, MRNE 400)",,,,
+Group: nudi_reactors,,,,
+"Members: Brianna Over, Fiona Parker and Luca Meyknecht",,,,
+"Contact: briannaover@outlook.com, or fionaparker100@gmail.com",,,,
+Methods:,"Specimens were placed in a long container with a grid where they were allowed to react to chemical cues, they were recorded during this",,,
+,trial time. Data from the trial period in nudi_treatmentdata and in nudi_vids. Footage was then analyed in Image J and recorded data,,,
+,"can be found in pred_trials, cons_trials and nudi_size.",,,
+,,,,
+Column,Data type,Description,,Units
+avg_length_m,number,average length of a given nudibranch from all its measured frames,,meters (m)
+nudi_num,integer,unique nudi id number,,

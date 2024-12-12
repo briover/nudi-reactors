@@ -1,0 +1,20 @@
+data file name: Meyknecht_Over_Parker_MRNE475_2024_combinedraw.csv,,,,
+date: December 5th 2024,,,,
+Study: Temperature-Induced Shifts in Chemosensory Responses of Hermissenda crassicornis to Predator and Conspecific Cues,,,,
+"Course: BMSC Fall Program 2024, Directed Studies (MRSC 507, MRNE 400)",,,,
+Group: nudi_reactors,,,,
+"Members: Brianna Over, Fiona Parker and Luca Meyknecht",,,,
+"Contact: briannaover@outlook.com, or fionaparker100@gmail.com",,,,
+Methods:,"Specimens were placed in a long container with a grid where they were allowed to react to chemical cues, they were recorded during this",,,
+,trial time. Data from the trial period in nudi_treatmentdata and in nudi_vids. Footage was then analyed in Image J and recorded data,,,
+,"can be found in pred_trials, cons_trials and nudi_size.",,,
+,,,,
+Column,Data type,Description,,Units
+mean_angle,number,the average angle a nudibanch moved over its trial fromits starting point,,degrees (°)
+sd_angle,number,"the standard deviation, of the mean angle",,degrees (°)
+mean_vel,number,mean velocity a nudibranch traveled over its trial period,,meters per second (m/s)
+sd_vel,number,the standard deviation of the mean velocity,,meters per second (m/s)
+direction_binom,integer,a binomial that describes if the nudi moved towards (1) or away (0) from the cue,,
+nudi_num,integer,unique nudi id number,,
+trial_type,character,"""predator"" for predatory cues, or ""conspecific"" for conspecific cues",,
+temp_grp,integer,trial group temperaure,,degrees Celcius (°C)
